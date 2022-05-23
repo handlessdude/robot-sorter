@@ -4,15 +4,38 @@ const inputs = useInputsStore();
 </script>
 
 <template>
-  <div class="inputs-form">
-    <div class="card num-inputs">
-      <input type="number" v-model="inputs.lineVelocity" />
-      <input type="number" v-model="inputs.activityR" />
-      <input type="number" v-model="inputs.driveMaxVelocity" />
-      <input type="number" v-model="inputs.bearingMaxVelocity" />
-      <input type="number" v-model="inputs.manipulatorCount" />
+  <div class="inputs-form card">
+    <h4>Please enter parameters of the manipulation system:</h4>
+    <div class="num-inputs">
+      <input type="number" id="lineVelocity" v-model="inputs.lineVelocity" />
+      <label for="lineVelocity">Line velocity</label>
+
+      <input type="number" id="activityR" v-model="inputs.activityR" />
+      <label for="activityR">Radius of manipulator activity</label>
+
+      <input
+        type="number"
+        id="driveMaxVelocity"
+        v-model="inputs.driveMaxVelocity"
+      />
+      <label for="driveMaxVelocity">Drive max velocity</label>
+
+      <input
+        type="number"
+        id="bearingMaxVelocity"
+        v-model="inputs.bearingMaxVelocity"
+      />
+      <label for="bearingMaxVelocity">Bearing max velocity</label>
+
+      <input
+        type="number"
+        id="manipulatorCount"
+        v-model="inputs.manipulatorCount"
+      />
+      <label for="manipulatorCount">Manipulator count</label>
     </div>
 
+    <h4>Please select items to put on the line:</h4>
     <div class="items-checked">
       <input
         type="checkbox"
@@ -24,6 +47,9 @@ const inputs = useInputsStore();
 
       <input type="checkbox" id="cup" value="cup" v-model="inputs.items" />
       <label for="cup">Сup</label>
+
+      <input type="checkbox" id="donut" value="donut" v-model="inputs.items" />
+      <label for="donut">Donut</label>
 
       <input
         type="checkbox"
@@ -49,12 +75,24 @@ const inputs = useInputsStore();
 </template>
 
 <style scoped lang="scss">
+.inputs-form.card {
+  padding: 0 1.5rem 0 1.5rem;
+}
 .num-inputs {
-  display: flex;
-  flex-direction: column;
+  // display: grid;
+  // grid-template: 40px 40px 40px / 100px 1fr 100px 1fr;
+  // display: flex;
+  // flex-direction: column;
+  display: grid;
+  grid-template: 40px 40px 40px 40px 40px / 100px 1fr;
+  grid-gap: 1rem;
+  label {
+    margin-left: 1rem;
+  }
 }
 .items-checked {
+  width: 100%;
   display: grid;
-  grid-template: 40px 40px / 1fr 1fr;
+  grid-template: 40px 40px / 20px 1fr 20px 1fr 20px 1fr 20px 1fr;
 }
 </style>

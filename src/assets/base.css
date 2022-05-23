@@ -46,7 +46,7 @@ html {
   font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
     Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   color: var(--color-text);
-  background: var(--color-background);
+  background: var(--gray);
   transition: color 0.5s, background-color 0.5s;
   /* background-color: var(--gray);
   color: var(--dark-gray); */
@@ -62,14 +62,13 @@ body {
 main {
   padding: 1rem;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   position: fixed;
   top: var(--header-height);
   right:0;
   left:0;
   bottom: 0;
-  z-index: 990;
 }
 
 input,
@@ -82,8 +81,11 @@ textarea{
   border-radius: 3px;
   font-size: 1rem;
   resize: none;
+ 
 }
-
+input[type=number]{
+   width: 100px;
+}
 input:active:not(:disabled),
 input:focus,
 textarea:active,
@@ -93,9 +95,12 @@ textarea:focus {
 textarea:disabled{
   background-color: white;
 }
-/* textarea, h1{
-  width: 100%;
-} */
+.card {
+  border-radius: var(--round-borders-radius);
+  background: var(--white);
+  padding: 1.5rem;
+}
+
 textarea#query{
   height: 4rem;
   margin-bottom: 1rem;
@@ -114,7 +119,7 @@ textarea#query{
   white-space: nowrap;
   font-weight: 700;
   outline: none;
-  background: var(--greeny);
+  background: var(--header-color);
   transition: all 0.22s;
 }
 
