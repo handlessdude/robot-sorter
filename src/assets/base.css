@@ -1,74 +1,137 @@
-/* color palette from <https://github.com/vuejs/theme> */
 :root {
-  --vt-c-white: #ffffff;
-  --vt-c-white-soft: #f8f8f8;
-  --vt-c-white-mute: #f2f2f2;
-
-  --vt-c-black: #181818;
-  --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
-
-  --vt-c-indigo: #2c3e50;
-
-  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
-  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
-  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
-  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
-
-  --vt-c-text-light-1: var(--vt-c-indigo);
-  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
-  --vt-c-text-dark-1: var(--vt-c-white);
-  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+  --active-link: #61dafb;
+  --magenta: #f09;
+  --red:#ff002f;
+  --white: #ffffff;
+  --gray: #edeef0;
+  --light-gray: #6b6b6b;
+  --middle-gray: #4d4d4d;
+  --dark-gray: #282828;
+  --darkest-gray:  #121212;
+  --lazure: #0fa;
+  --emerald: #276749;
+  --light-emerald: #2f855a;
+  --lightest-emerald: #38a169;
+  --greeny: #63d2a6;
+  --header-height: 5rem;
+  --menu-btn-width: 7rem;
+  --menu-btn-height: 3rem;
+  --preloader-wrapper-size: 80px;
+  --round-borders-radius: 5px;
+  --circle-border-radius: 100px;
+  --sidebar-bg-color: #2f855a;
+  --sidebar-item-hover: #38a169;
+  --sidebar-item-active: #276749;
+  --menu-size: 500px;
+  --menu-padding: 2rem;
+  --menu-icon-size: 100px;
+  --menu-icon-border-radius: 50%;
+  --header-color: #2058c1;
+  --header-color2: #486ec6;
 }
 
-/* semantic color variables for this project */
-:root {
-  --color-background: var(--vt-c-white);
-  --color-background-soft: var(--vt-c-white-soft);
-  --color-background-mute: var(--vt-c-white-mute);
-
-  --color-border: var(--vt-c-divider-light-2);
-  --color-border-hover: var(--vt-c-divider-light-1);
-
-  --color-heading: var(--vt-c-text-light-1);
-  --color-text: var(--vt-c-text-light-1);
-
-  --section-gap: 160px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-background: var(--vt-c-black);
-    --color-background-soft: var(--vt-c-black-soft);
-    --color-background-mute: var(--vt-c-black-mute);
-
-    --color-border: var(--vt-c-divider-dark-2);
-    --color-border-hover: var(--vt-c-divider-dark-1);
-
-    --color-heading: var(--vt-c-text-dark-1);
-    --color-text: var(--vt-c-text-dark-2);
-  }
-}
-
-*,
-*::before,
-*::after {
+* {
   box-sizing: border-box;
-  margin: 0;
-  position: relative;
-  font-weight: normal;
 }
 
-body {
-  min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
-  transition: color 0.5s, background-color 0.5s;
-  line-height: 1.6;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  font-size: 15px;
+html, body {
+  height: 100vh;
+  margin: 0;
+}
+
+html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition: color 0.5s, background-color 0.5s;
+  /* background-color: var(--gray);
+  color: var(--dark-gray); */
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+main {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  position: fixed;
+  top: var(--header-height);
+  right:0;
+  left:0;
+  bottom: 0;
+  z-index: 990;
+}
+
+input,
+select,
+textarea{
+  font-family: Inter, Roboto, Oxygen, Fira Sans, Helvetica Neue, sans-serif;
+  outline: none;
+  border: 2px solid #ccc;
+  padding: 0.5rem 1rem;
+  border-radius: 3px;
+  font-size: 1rem;
+  resize: none;
+}
+
+input:active:not(:disabled),
+input:focus,
+textarea:active,
+textarea:focus {
+  transition: border 0.22s;
+}
+textarea:disabled{
+  background-color: white;
+}
+/* textarea, h1{
+  width: 100%;
+} */
+textarea#query{
+  height: 4rem;
+  margin-bottom: 1rem;
+}
+.btn {
+  color: white;
+  place-content: center;
+  place-items: center;
+  width: 15rem;
+  border-radius: 99px;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--greeny);
+  text-decoration: none;
+  text-transform: uppercase;
+  padding: 0.5rem 1.5rem;
+  white-space: nowrap;
+  font-weight: 700;
+  outline: none;
+  background: var(--greeny);
+  transition: all 0.22s;
+}
+
+.btn:hover {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 1!important;
+  background: #eee!important;
+  border-color: #ddd!important;
+  color: #999!important;
+}
+
+.btn:active {
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.3);
 }
