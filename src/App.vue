@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import NavHeader from "./components/NavHeader.vue";
 import InputsForm from "./components/InputsForm.vue";
-import MyCanvas from "./components/MyCanvas.vue";
+import WorldCanvas from "./components/WorldCanvas.vue";
 
 //
 //
@@ -12,13 +12,12 @@ const inputs = useInputsStore();
 
 <template>
   <NavHeader />
-
   <main>
-    <MyCanvas />
+    <WorldCanvas />
     <InputsForm />
   </main>
 </template>
 
-<style>
-@import "./assets/base.css";
+<style lang="scss">
+@import "./assets/base.scss";
 </style>
