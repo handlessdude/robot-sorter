@@ -3,9 +3,11 @@ export enum ItemTypes {
   BANANA = "banana",
   BOTTLE = "bottle",
   CAKE = "cake",
+
   CLOCK = "clock",
   CUP = "cup",
   DONUT = "donut",
+  PIZZA = "pizza",
 }
 export type ItemType = keyof typeof ItemTypes;
 
