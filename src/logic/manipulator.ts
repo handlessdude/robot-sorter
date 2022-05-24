@@ -2,8 +2,8 @@ import type { IItem } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
 import type { IBin } from "@/types/bin";
 import { useTrafficState } from "@/stores/trafficState";
-import { useInputsStore } from "@/stores/inputs";
-const inputStore = useInputsStore();
+import { useInputsState } from "@/stores/inputsState";
+const inputState = useInputsState();
 
 class Manipulator {
   readonly id: number;
@@ -36,7 +36,7 @@ class Manipulator {
 
   findBins(): void {
     // bins here
-    // inputStore.$state.bins
+    // inputState.$state.bins
     //манипуляторам придётся самим найти свои урны
   }
 
