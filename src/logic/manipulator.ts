@@ -3,6 +3,7 @@ import type { IPoint } from "@/types/point";
 import type { IBin } from "@/types/bin";
 import { useTrafficState } from "@/stores/trafficState";
 import { useInputsState } from "@/stores/inputsState";
+import { distance } from "@/utils/utils";
 const inputState = useInputsState();
 
 class Manipulator {
@@ -35,9 +36,12 @@ class Manipulator {
   }
 
   findBins(): void {
-    // bins here
-    // inputState.$state.bins
     //манипуляторам придётся самим найти свои урны
+    for (const bin of inputState.$state.bins) {
+      if (distance(bin.coordinates, this.coordinates) <= this.radius) {
+        this.bins.push(bin);
+      }
+    }
   }
 
   tryTakeItem(item: IItem): void | boolean {
