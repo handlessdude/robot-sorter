@@ -1,3 +1,5 @@
+import type { IPoint } from "./point";
+
 export enum ItemTypes {
   APPLE = "apple",
   BANANA = "banana",
@@ -14,6 +16,6 @@ export type ItemType = keyof typeof ItemTypes;
 export interface IItem {
   img: HTMLImageElement;
   item_type: ItemType;
-  x: number;
-  y: number;
+  coordinates: IPoint;
+  holded: boolean;
 }

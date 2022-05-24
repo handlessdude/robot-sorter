@@ -4,4 +4,5 @@ export const worldConstants = {
   ITEM_GEN_TIMESPAN: 5000,
   IMG_SCALE_QUOTIENT: 0.2,
   ITEM_VELOCITY_DELTA: 2,
+  GRAB_DISTANCE: 1,
 };

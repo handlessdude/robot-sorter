@@ -26,11 +26,14 @@ export const useTrafficState = defineStore({
       this.traffic.push({
         img,
         item_type: getImgItem(img.src) as ItemType,
-        x:
-          Math.random() *
-          (worldConstants.WORLD_CANVAS_WIDTH -
-            img.width * worldConstants.IMG_SCALE_QUOTIENT),
-        y: -img.height * worldConstants.IMG_SCALE_QUOTIENT,
+        coordinates: {
+          x:
+            Math.random() *
+            (worldConstants.WORLD_CANVAS_WIDTH -
+              img.width * worldConstants.IMG_SCALE_QUOTIENT),
+          y: -img.height * worldConstants.IMG_SCALE_QUOTIENT,
+        },
+        holded: false,
       });
     },
     updateTraffic(
@@ -48,8 +51,8 @@ export const useTrafficState = defineStore({
           0, // sy
           item.img.width, // sWidth
           item.img.height, // sHeight
-          item.x, // dx
-          item.y, // dy
+          item.coordinates.x, // dx
+          item.coordinates.y, // dy
           Math.floor(item.img.width * worldConstants.IMG_SCALE_QUOTIENT), // dWidth
           Math.floor(item.img.height * worldConstants.IMG_SCALE_QUOTIENT) // dHeight
         );

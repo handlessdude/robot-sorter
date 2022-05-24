@@ -4,6 +4,7 @@ import type { IBin } from "@/types/bin";
 import { useTrafficState } from "@/stores/trafficState";
 import { useInputsState } from "@/stores/inputsState";
 import { distance } from "@/utils/utils";
+import { worldConstants } from "@/stupidConstants/worldConstants";
 const inputState = useInputsState();
 
 class Manipulator {
@@ -13,7 +14,7 @@ class Manipulator {
   bins: Array<IBin>;
   _currentBearingAngle: number;
   _currentDrivePlace: number;
-  readonly holdedItem?: IItem;
+  holdedItem?: IItem;
 
   set currentBearingAngle(value: number) {
     if (value >= 0 && value <= 2 * Math.PI) this._currentBearingAngle = value;
@@ -45,8 +46,18 @@ class Manipulator {
   }
 
   tryTakeItem(item: IItem): void | boolean {
-    // Пытается взять предмет
-    // пока хз
+    if (
+      distance(item.coordinates, this.coordinates) <=
+        worldConstants.GRAB_DISTANCE &&
+      this.holdedItem == undefined &&
+      !item.holded
+    ) {
+      this.holdedItem = item;
+      item.holded = true;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   throwItem(): void {
