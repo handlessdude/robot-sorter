@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-
 export const useInputsStore = defineStore({
   id: "inputs",
   state: () => ({
@@ -9,14 +8,6 @@ export const useInputsStore = defineStore({
     bearingMaxVelocity: 0,
     driveMaxVelocity: 0,
     manipulatorCount: 0,
-    items: [],
+    items: <string[]>[],
   }),
-  // getters: {
-  //   //doubleCount: (state) => state.counter * 2,
-  // },
-  // actions: {
-  //   // increment() {
-  //   //   this.counter++;
-  //   // },
-  // },
 });

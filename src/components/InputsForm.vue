@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { useInputsStore } from "@/stores/inputs";
+import { useWorldState } from "@/stores/worldState";
 const inputs = useInputsStore();
+const worldState = useWorldState();
 </script>
 
 <template>
   <div class="inputs-overlay">
     <div class="inputs-form card">
+      <!-- <h3>{{ inputs.items }}</h3> -->
+      <!-- <h3>{{ worldState.traffic }}</h3> -->
       <h4>Please enter parameters of the manipulation system:</h4>
       <div class="num-inputs">
         <input
