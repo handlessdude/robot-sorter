@@ -7,7 +7,7 @@ import { distance } from "@/utils/utils";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 const inputState = useInputsState();
 
-class Manipulator {
+export class Manipulator {
   readonly id: number;
   readonly radius: number;
   readonly coordinates: IPoint;
@@ -50,10 +50,10 @@ class Manipulator {
       distance(item.coordinates, this.coordinates) <=
         worldConstants.GRAB_DISTANCE &&
       this.holdedItem == undefined &&
-      !item.holded
+      item.holdedBy == undefined
     ) {
       this.holdedItem = item;
-      item.holded = true;
+      item.holdedBy = this;
       return true;
     } else {
       return false;
@@ -61,7 +61,22 @@ class Manipulator {
   }
 
   throwItem(): void {
-    //
+    if (this.holdedItem == undefined) return;
+
+    this.holdedItem.holdedBy = undefined;
+    // BINS MUST BE SPLITTED
+    for (const bin of this.bins) {
+      if (
+        distance(bin.coordinates, this.holdedItem!.coordinates) <=
+        worldConstants.GRAB_DISTANCE
+      ) {
+        if (bin.itemType == this.holdedItem!.item_type) {
+          bin.numberOfCorrect++;
+          // TODO ! delete this.holdedItem
+          this.holdedItem = undefined;
+        }
+      }
+    }
   }
 
   rotateBearing(radians: number): void {

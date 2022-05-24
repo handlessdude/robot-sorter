@@ -33,7 +33,7 @@ export const useTrafficState = defineStore({
               img.width * worldConstants.IMG_SCALE_QUOTIENT),
           y: -img.height * worldConstants.IMG_SCALE_QUOTIENT,
         },
-        holded: false,
+        holdedBy: undefined,
       });
     },
     updateTraffic(

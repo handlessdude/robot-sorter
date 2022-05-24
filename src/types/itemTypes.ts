@@ -1,4 +1,5 @@
 import type { IPoint } from "./point";
+import type { Manipulator } from "@/logic/manipulator";
 
 export enum ItemTypes {
   APPLE = "apple",
@@ -17,5 +18,5 @@ export interface IItem {
   img: HTMLImageElement;
   item_type: ItemType;
   coordinates: IPoint;
-  holded: boolean;
+  holdedBy?: Manipulator; // используется ли манипулятором
 }
