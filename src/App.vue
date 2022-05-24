@@ -5,8 +5,6 @@ import WorldCanvas from "./components/WorldCanvas.vue";
 
 //
 //
-import { useInputsStore } from "@/stores/inputs";
-const inputs = useInputsStore();
 //
 </script>
 

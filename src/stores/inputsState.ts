@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-export const useInputsStore = defineStore({
+export const useInputsState = defineStore({
   id: "inputs",
   state: () => ({
     lineVelocity: 0,

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { useInputsStore } from "@/stores/inputs";
-import { useWorldState } from "@/stores/worldState";
-const inputs = useInputsStore();
-const worldState = useWorldState();
+import { useInputsState } from "@/stores/inputsState";
+const inputs = useInputsState();
 </script>
 
 <template>

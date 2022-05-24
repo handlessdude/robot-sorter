@@ -1,4 +1,4 @@
-import { useInputsStore } from "./inputs";
+import { useInputsState } from "./inputsState";
 import { defineStore } from "pinia";
 import type { ItemType, IItem } from "@/types/itemTypes";
 import { worldConstants } from "@/stupidConstants/worldConstants";
@@ -7,19 +7,20 @@ export const useTrafficState = defineStore({
   id: "worldState",
   //сюда пишется текущее состояние
   state: () => ({
-    traffic: <IItem[]>[],
+    //traffic: <IItem[]>[], //equivalents
+    traffic: Array<IItem>(),
   }),
 
   // экшены нужны для изменения state
   actions: {
     genNewImg() {
-      const inputsStore = useInputsStore();
-      if (inputsStore.items.length === 0) {
+      const inputsState = useInputsState();
+      if (inputsState.items.length === 0) {
         return;
       }
       const img = new Image();
       img.src = genImgPath(
-        inputsStore.items[Math.floor(Math.random() * inputsStore.items.length)]
+        inputsState.items[Math.floor(Math.random() * inputsState.items.length)]
       );
       console.log(`Generating new image: ${getImgItem(img.src)}`);
       this.traffic.push({
