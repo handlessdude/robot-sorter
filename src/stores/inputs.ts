@@ -1,3 +1,4 @@
+import type { IBin } from "@/types/bin";
 import { defineStore } from "pinia";
 export const useInputsStore = defineStore({
   id: "inputs",
@@ -9,5 +10,6 @@ export const useInputsStore = defineStore({
     driveMaxVelocity: 0,
     manipulatorCount: 0,
     items: <string[]>[],
+    bins: <IBin[]>[],
   }),
 });

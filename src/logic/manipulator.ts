@@ -1,11 +1,18 @@
+import type { IItem } from "@/types/itemTypes";
+import type { IPoint } from "@/types/point";
+import type { IBin } from "@/types/bin";
+import { useTrafficState } from "@/stores/trafficState";
+import { useInputsStore } from "@/stores/inputs";
+const inputStore = useInputsStore();
+
 class Manipulator {
   readonly id: number;
   readonly radius: number;
-  readonly coordinates: Point;
-  bins: Array<Bin>;
+  readonly coordinates: IPoint;
+  bins: Array<IBin>;
   _currentBearingAngle: number;
   _currentDrivePlace: number;
-  readonly holdedItem?: Item;
+  readonly holdedItem?: IItem;
 
   set currentBearingAngle(value: number) {
     if (value >= 0 && value <= 2 * Math.PI) this._currentBearingAngle = value;
@@ -17,22 +24,25 @@ class Manipulator {
     else console.warn("The angle is in [0; 1]");
   }
 
-  constructor(id: number, radius: number, coordinates: Point) {
+  constructor(id: number, radius: number, coordinates: IPoint) {
     this.id = id;
     this.radius = radius;
     this.coordinates = coordinates;
-    this.bins = Array<Bin>();
+    this.bins = <IBin[]>[];
     this._currentBearingAngle = 0;
     this._currentDrivePlace = 0;
     this.holdedItem = undefined;
   }
 
-  findBins(bins: Array<Bin>): void {
+  findBins(): void {
+    // bins here
+    // inputStore.$state.bins
     //манипуляторам придётся самим найти свои урны
   }
 
-  tryTakeItem(item: Item): void | boolean {
+  tryTakeItem(item: IItem): void | boolean {
     // Пытается взять предмет
+    // пока хз
   }
 
   throwItem(): void {
