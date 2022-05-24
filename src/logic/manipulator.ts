@@ -4,16 +4,17 @@ import type { IBin } from "@/types/bin";
 import { useTrafficState } from "@/stores/trafficState";
 import { useInputsState } from "@/stores/inputsState";
 import { distance } from "@/utils/utils";
+import { worldConstants } from "@/stupidConstants/worldConstants";
 const inputState = useInputsState();
 
-class Manipulator {
+export class Manipulator {
   readonly id: number;
   readonly radius: number;
   readonly coordinates: IPoint;
   bins: Array<IBin>;
   _currentBearingAngle: number;
   _currentDrivePlace: number;
-  readonly holdedItem?: IItem;
+  holdedItem?: IItem;
 
   set currentBearingAngle(value: number) {
     if (value >= 0 && value <= 2 * Math.PI) this._currentBearingAngle = value;
@@ -45,12 +46,37 @@ class Manipulator {
   }
 
   tryTakeItem(item: IItem): void | boolean {
-    // Пытается взять предмет
-    // пока хз
+    if (
+      distance(item.coordinates, this.coordinates) <=
+        worldConstants.GRAB_DISTANCE &&
+      this.holdedItem == undefined &&
+      item.holdedBy == undefined
+    ) {
+      this.holdedItem = item;
+      item.holdedBy = this;
+      return true;
+    } else {
+      return false;
+    }
   }
 
   throwItem(): void {
-    //
+    if (this.holdedItem == undefined) return;
+
+    this.holdedItem.holdedBy = undefined;
+    // BINS MUST BE SPLITTED
+    for (const bin of this.bins) {
+      if (
+        distance(bin.coordinates, this.holdedItem!.coordinates) <=
+        worldConstants.GRAB_DISTANCE
+      ) {
+        if (bin.itemType == this.holdedItem!.item_type) {
+          bin.numberOfCorrect++;
+          // TODO ! delete this.holdedItem
+          this.holdedItem = undefined;
+        }
+      }
+    }
   }
 
   rotateBearing(radians: number): void {

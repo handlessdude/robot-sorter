@@ -38,8 +38,15 @@ function animate() {
   /*DO NOT FORGET TO CLEAN UP FAR-GONE ITEMS*/
   /*ALL THE UPDATINGS GO HERE*/
   trafficState.updateTraffic(
-    (item) => item.y < window.innerHeight - worldConstants.HEADER_OFFSET,
-    (item) => ({ ...item, y: item.y + worldConstants.ITEM_VELOCITY_DELTA })
+    (item) =>
+      item.coordinates.y < window.innerHeight - worldConstants.HEADER_OFFSET,
+    (item) => ({
+      ...item,
+      coordinates: {
+        x: item.coordinates.x,
+        y: item.coordinates.y + worldConstants.ITEM_VELOCITY_DELTA,
+      },
+    })
   );
   //console.log("current worldState.traffic.length", worldState.traffic.length);
 
