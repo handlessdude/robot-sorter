@@ -1,41 +1,53 @@
 <script setup lang="ts">
-import { useInputsStore } from "@/stores/inputs";
-import { onMounted, ref } from "vue";
-import { useWorldCanvas } from "@/world/useWorldCanvas";
-import Line from "@/world/Line";
+import { onMounted } from "vue";
+
+const delta = 5 * 16;
+const inner_width = 800;
 let worldCanvas: HTMLCanvasElement;
 let worldCanvasCtx: CanvasRenderingContext2D;
 
-const sources = ["https://mdn.mozillademos.org/files/5397/rhino.jpg"];
-let traffic = sources.map((pic) => {
-  const img = new Image(100, 100);
-  img.src = pic;
-  return img;
-});
-
+const sources = ["https://www.w3schools.com/tags/img_the_scream.jpg"];
+//let traffic = sources.map((pic) => genNewImg());
+let traffic = [genNewImg()];
+function genNewImg() {
+  const img = new Image();
+  img.src = sources[0];
+  return {
+    img,
+    x: Math.random() * (inner_width - 227),
+    y: 0,
+  };
+}
+function pushNewImg() {
+  traffic.push(genNewImg());
+  console.log(traffic);
+}
 onMounted(() => {
+  worldCanvas = document.getElementById("worldCanvas") as HTMLCanvasElement;
+  worldCanvasCtx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
+  //animate();
+  setInterval(pushNewImg, 500);
   animate();
 });
 
-function animate() {
-  worldCanvas = document.getElementById("worldCanvas") as HTMLCanvasElement;
-  worldCanvasCtx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
-
+function drawTraffic() {
+  //lol do not touch these LINES
+  worldCanvas.height = window.innerHeight - delta;
+  worldCanvas.width = inner_width;
+  //
   worldCanvasCtx.save();
-  worldCanvasCtx.translate(0, -100 + worldCanvas.height * 0.7);
-  let line = new Line(worldCanvas.width / 2, worldCanvas.width * 0.9);
-  line.draw(worldCanvasCtx);
-
-  // for (let i = 0; i < traffic.length; i++) {
-  //   traffic[i].draw(carCtx, "red");
-  // }
-  // car.draw(carCtx, "blue");
-  traffic.forEach((img) => {
-    worldCanvasCtx.drawImage(img, 0, 0);
+  traffic.forEach((item) => {
+    worldCanvasCtx.drawImage(item.img, item.x, item.y);
   });
   worldCanvasCtx.restore();
+}
+function animate() {
+  traffic = traffic
+    .filter((item) => item.y < window.innerHeight - delta + 227)
+    .map((item) => ({ ...item, y: item.y + 5 }));
+  drawTraffic();
 
-  requestAnimationFrame(animate);
+  window.requestAnimationFrame(animate);
 }
 </script>
 
@@ -54,7 +66,7 @@ function animate() {
 }
 #worldCanvas {
   background: var(--white);
-  width: 600px;
+  width: 800px;
   height: calc(100vh - var(--header-height));
 }
 </style>
