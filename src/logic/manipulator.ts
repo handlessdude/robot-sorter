@@ -38,7 +38,7 @@ export class Manipulator {
 
   findBins(): void {
     //манипуляторам придётся самим найти свои урны
-    for (const bin of inputState.$state.bins) {
+    for (const bin of inputState.$state.data.bins) {
       if (distance(bin.coordinates, this.coordinates) <= this.radius) {
         this.bins.push(bin);
       }

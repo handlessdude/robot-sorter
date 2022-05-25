@@ -15,23 +15,26 @@ export const useTrafficState = defineStore({
   actions: {
     genNewImg() {
       const inputsState = useInputsState();
-      if (inputsState.items.length === 0) {
+      if (inputsState.data.items.length === 0) {
         return;
       }
       const img = new Image();
       img.src = genImgPath(
-        inputsState.items[Math.floor(Math.random() * inputsState.items.length)]
+        inputsState.data.items[
+          Math.floor(Math.random() * inputsState.data.items.length)
+        ]
       );
       console.log(`Generating new image: ${getImgItem(img.src)}`);
       this.traffic.push({
         img,
         item_type: getImgItem(img.src) as ItemType,
         coordinates: {
-          x:
+          x: Math.floor(
             Math.random() *
-            (worldConstants.WORLD_CANVAS_WIDTH -
-              img.width * worldConstants.IMG_SCALE_QUOTIENT),
-          y: -img.height * worldConstants.IMG_SCALE_QUOTIENT,
+              (worldConstants.WORLD_CANVAS_WIDTH -
+                img.width * worldConstants.IMG_SCALE_QUOTIENT)
+          ),
+          y: -Math.floor(img.height * worldConstants.IMG_SCALE_QUOTIENT),
         },
         holdedBy: undefined,
       });

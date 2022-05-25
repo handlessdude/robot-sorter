@@ -103,7 +103,9 @@ textarea:disabled{
   background: var(--white);
   padding: 1.5rem;
 }
-
+small {
+color: crimson;
+}
 textarea#query{
   height: 4rem;
   margin-bottom: 1rem;
@@ -112,7 +114,7 @@ textarea#query{
   color: white;
   place-content: center;
   place-items: center;
-  width: 15rem;
+  width: 12rem;
   border-radius: 99px;
   letter-spacing: 0.05em;
   border: 1px solid var(--greeny);
@@ -124,8 +126,12 @@ textarea#query{
   outline: none;
   background: var(--header-color);
   transition: all 0.22s;
+  text-align: center;
 }
-
+.btn.stop{
+  background: crimson;
+  border-color: pink;
+}
 .btn:hover {
   cursor: pointer;
   opacity: 0.8;

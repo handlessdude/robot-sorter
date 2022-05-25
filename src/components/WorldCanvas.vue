@@ -1,34 +1,45 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, watch } from "vue";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 import { useTrafficState } from "@/stores/trafficState";
 import "@tensorflow/tfjs-backend-cpu";
 import "@tensorflow/tfjs-backend-webgl";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
+import { useInputsState } from "@/stores/inputsState";
 /*TODO REFACTOR INTO STORE*/
+const inputsState = useInputsState();
 const trafficState = useTrafficState();
 let worldCanvas: HTMLCanvasElement;
-let genNewImgInterval: number;
 let model: cocoSsd.ObjectDetection;
+let genImgReqID: number;
+let animFrameReqID: number;
 
 onMounted(() => {
   cocoSsd.load({ base: "lite_mobilenet_v2" }).then(function (loadedModel) {
     model = loadedModel;
-    console.log(model);
-
     worldCanvas = document.getElementById("worldCanvas") as HTMLCanvasElement;
-    console.log(worldCanvas);
-
-    animate();
-    genNewImgInterval = setInterval(
-      trafficState.genNewImg,
-      worldConstants.ITEM_GEN_TIMESPAN
-    );
+    console.log("Model and canvas are ready!");
   });
 });
-onUnmounted(() => {
-  clearInterval(genNewImgInterval);
-});
+watch(
+  () => inputsState.submitted,
+  (newSubmitted) => {
+    if (newSubmitted) {
+      /*if no model request model and so on if we actually will use model*/
+      animate();
+      genImgReqID = setInterval(
+        trafficState.genNewImg,
+        worldConstants.ITEM_GEN_TIMESPAN
+      );
+    } else {
+      clear();
+    }
+  }
+);
+function clear() {
+  window.cancelAnimationFrame(animFrameReqID);
+  clearInterval(genImgReqID);
+}
 
 function animate() {
   if (!model) {
@@ -68,7 +79,7 @@ function animate() {
 
   ctx.restore();
 
-  window.requestAnimationFrame(animate);
+  animFrameReqID = window.requestAnimationFrame(animate);
 }
 </script>
 
