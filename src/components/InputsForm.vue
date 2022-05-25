@@ -15,6 +15,7 @@ const inputs = useInputsState();
           id="lineVelocity"
           min="0"
           step="any"
+          :disabled="inputs.submitted"
           v-model="inputs.data.lineVelocity"
         />
         <label for="lineVelocity">Line velocity</label>
@@ -24,6 +25,7 @@ const inputs = useInputsState();
           id="activityR"
           min="0"
           step="any"
+          :disabled="inputs.submitted"
           v-model="inputs.data.activityR"
         />
         <label for="activityR">Radius of manipulator activity</label>
@@ -33,6 +35,7 @@ const inputs = useInputsState();
           id="driveMaxVelocity"
           min="0"
           step="any"
+          :disabled="inputs.submitted"
           v-model="inputs.data.driveMaxVelocity"
         />
         <label for="driveMaxVelocity">Drive max velocity</label>
@@ -42,6 +45,7 @@ const inputs = useInputsState();
           id="bearingMaxVelocity"
           min="0"
           step="any"
+          :disabled="inputs.submitted"
           v-model="inputs.data.bearingMaxVelocity"
         />
         <label for="bearingMaxVelocity">Bearing max velocity</label>
@@ -51,6 +55,7 @@ const inputs = useInputsState();
           id="manipulatorCount"
           min="1"
           step="1"
+          :disabled="inputs.submitted"
           v-model="inputs.data.manipulatorCount"
         />
         <label for="manipulatorCount">Manipulator count</label>
@@ -62,6 +67,7 @@ const inputs = useInputsState();
           type="checkbox"
           id="bottle"
           value="bottle"
+          :disabled="inputs.submitted"
           v-model="inputs.data.items"
         />
         <label for="bottle">Bottle</label>
@@ -70,6 +76,7 @@ const inputs = useInputsState();
           type="checkbox"
           id="cup"
           value="cup"
+          :disabled="inputs.submitted"
           v-model="inputs.data.items"
         />
         <label for="cup">Сup</label>
@@ -78,6 +85,7 @@ const inputs = useInputsState();
           type="checkbox"
           id="donut"
           value="donut"
+          :disabled="inputs.submitted"
           v-model="inputs.data.items"
         />
         <label for="donut">Donut</label>
@@ -86,6 +94,7 @@ const inputs = useInputsState();
           type="checkbox"
           id="banana"
           value="banana"
+          :disabled="inputs.submitted"
           v-model="inputs.data.items"
         />
         <label for="banana">Banana</label>
@@ -94,6 +103,7 @@ const inputs = useInputsState();
           type="checkbox"
           id="apple"
           value="apple"
+          :disabled="inputs.submitted"
           v-model="inputs.data.items"
         />
         <label for="apple">Apple</label>
@@ -102,6 +112,7 @@ const inputs = useInputsState();
           type="checkbox"
           id="pizza"
           value="pizza"
+          :disabled="inputs.submitted"
           v-model="inputs.data.items"
         />
         <label for="pizza">Pizza</label>
@@ -110,6 +121,7 @@ const inputs = useInputsState();
           type="checkbox"
           id="cake"
           value="cake"
+          :disabled="inputs.submitted"
           v-model="inputs.data.items"
         />
         <label for="cake">Cake</label>
@@ -118,10 +130,39 @@ const inputs = useInputsState();
           type="checkbox"
           id="clock"
           value="clock"
+          :disabled="inputs.submitted"
           v-model="inputs.data.items"
         />
         <label for="clock">Clock</label>
       </div>
+
+      <div class="control-btns">
+        <button
+          class="btn manips"
+          :disabled="inputs.submitted"
+          @click="inputs.startSimulation"
+        >
+          Pick manipulators
+        </button>
+        <button
+          class="btn bins"
+          :disabled="inputs.submitted || !inputs.nextTypeToPlaceBin"
+          @click="inputs.endSimulation"
+        >
+          Pick bins
+        </button>
+      </div>
+
+      <hr
+        style="
+          margin: 1.5rem 0 1.5rem 0;
+          height: 1px;
+          borderwidth: 0;
+          color: #ccc;
+          backgroundcolor: #ccc;
+          width: 100%;
+        "
+      />
 
       <div class="control-btns">
         <!-- || !inputs.isValid -->
@@ -140,7 +181,9 @@ const inputs = useInputsState();
           End simulation
         </button>
       </div>
-      <small v-if="!inputs.isValid">{{ inputs.error }}</small>
+      <small v-if="!inputs.isValid && !inputs.errorEmpty">{{
+        inputs.error
+      }}</small>
     </div>
   </div>
 </template>

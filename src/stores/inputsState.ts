@@ -1,7 +1,11 @@
-import type { IBin } from "@/types/bin";
+import { Manipulator } from "@/logic/manipulator";
+
 import type { ItemType } from "@/types/itemTypes";
 import { isNotEmpty, isPositive } from "@/utils/utils";
 import { defineStore } from "pinia";
+import { hri } from "human-readable-ids";
+import { Bin } from "@/logic/bin";
+
 export const useInputsState = defineStore({
   id: "inputs",
   state: () => ({
@@ -13,13 +17,8 @@ export const useInputsState = defineStore({
       driveMaxVelocity: 0,
       manipulatorCount: 0,
       items: <string[]>[],
-      bins: <IBin[]>[
-        {
-          coordinates: { x: 0, y: 0 },
-          itemType: "banana" as ItemType,
-          numberOfCorrect: 0,
-        },
-      ],
+      bins: <Bin[]>[],
+      manipulators: <Manipulator[]>[],
     },
 
     submitted: false,
@@ -30,13 +29,39 @@ export const useInputsState = defineStore({
     isValid: (state) =>
       Object.values(state.data).reduce(
         (validity, value) =>
-          (Array.isArray(value) ? isNotEmpty(value) : isPositive(value)) &&
-          validity,
+          (Array.isArray(value)
+            ? isNotEmpty(value)
+            : /*isPositive(value)*/ true) && validity,
         true
       ),
+    errorEmpty: (state) => state.error === "",
+    nextTypeToPlaceBin: (state) => {
+      state.data.items.forEach((itemType) => {
+        if (
+          !state.data.bins.find(
+            (bin) => bin.itemType === (itemType as ItemType)
+          )
+        ) {
+          return itemType;
+        }
+      });
+      return null;
+    },
   },
 
   actions: {
+    placeNewManip(x: number, y: number) {
+      this.data.manipulators.push(
+        new Manipulator(hri.random(), this.data.activityR, { x, y })
+      );
+    },
+    placeNewBin(x: number, y: number) {
+      const nextType = this.nextTypeToPlaceBin;
+      if (!nextType) {
+        return;
+      }
+      this.data.bins.push(new Bin({ x, y }, nextType as ItemType, 0));
+    },
     startSimulation() {
       if (this.isValid) {
         this.submitted = true;

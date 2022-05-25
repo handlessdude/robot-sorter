@@ -1,17 +1,14 @@
 import type { IItem } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
-import type { IBin } from "@/types/bin";
-import { useTrafficState } from "@/stores/trafficState";
-import { useInputsState } from "@/stores/inputsState";
+import type { Bin } from "@/logic/bin";
 import { distance } from "@/utils/utils";
 import { worldConstants } from "@/stupidConstants/worldConstants";
-const inputState = useInputsState();
 
 export class Manipulator {
   readonly id: number;
   readonly radius: number;
   readonly coordinates: IPoint;
-  bins: Array<IBin>;
+  bins: Array<Bin>;
   _currentBearingAngle: number;
   _currentDrivePlace: number;
   holdedItem?: IItem;
@@ -30,15 +27,20 @@ export class Manipulator {
     this.id = id;
     this.radius = radius;
     this.coordinates = coordinates;
-    this.bins = <IBin[]>[];
+    this.bins = <Bin[]>[];
     this._currentBearingAngle = 0;
     this._currentDrivePlace = 0;
     this.holdedItem = undefined;
   }
 
-  findBins(): void {
+  findBins(bins: Array<Bin>): void {
     //манипуляторам придётся самим найти свои урны
-    for (const bin of inputState.$state.data.bins) {
+    // for (const bin of inputState.$state.data.bins) {
+    //   if (distance(bin.coordinates, this.coordinates) <= this.radius) {
+    //     this.bins.push(bin);
+    //   }
+    // }
+    for (const bin of bins) {
       if (distance(bin.coordinates, this.coordinates) <= this.radius) {
         this.bins.push(bin);
       }
@@ -71,7 +73,7 @@ export class Manipulator {
         worldConstants.GRAB_DISTANCE
       ) {
         if (bin.itemType == this.holdedItem!.item_type) {
-          bin.numberOfCorrect++;
+          bin.itemsPlaced++;
           // TODO ! delete this.holdedItem
           this.holdedItem = undefined;
         }

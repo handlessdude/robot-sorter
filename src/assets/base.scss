@@ -112,8 +112,10 @@ textarea#query{
 }
 .btn {
   color: white;
+  display: flex;
   place-content: center;
   place-items: center;
+  text-align: center;
   width: 12rem;
   border-radius: 99px;
   letter-spacing: 0.05em;
@@ -126,7 +128,6 @@ textarea#query{
   outline: none;
   background: var(--header-color);
   transition: all 0.22s;
-  text-align: center;
 }
 .btn.stop{
   background: crimson;
