@@ -10,13 +10,23 @@ enum InputMode {
   BINS = "bins",
   NONE = "none",
 }
-/*ну простите за костыль мне надоело делать ифы*/
+
 watch(
-  () => inputs.binsLen,
+  () => inputs.data.bins.length,
   () => {
-    if (inputs.binsLen === inputs.data.items.length) {
+    const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
+    inputs.drawBins(ctx);
+
+    if (inputs.binsCount === inputs.data.items.length) {
       inputMode.value = InputMode.NONE;
     }
+  }
+);
+watch(
+  () => inputs.data.manipulators.length,
+  () => {
+    const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
+    inputs.drawManips(ctx);
   }
 );
 const inputMode: Ref<InputMode> = ref(InputMode.NONE);

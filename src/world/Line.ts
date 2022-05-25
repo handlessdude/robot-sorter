@@ -1,3 +1,4 @@
+import { worldConstants } from "./../stupidConstants/worldConstants";
 import { lerp } from "@/utils/utils";
 export default class Line {
   x: number;

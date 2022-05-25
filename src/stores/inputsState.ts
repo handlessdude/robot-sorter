@@ -44,7 +44,7 @@ export const useInputsState = defineStore({
       console.log(res);
       return res;
     },
-    binsLen: (state) => state.data.bins.length,
+    binsCount: (state) => state.data.bins.length,
   },
 
   actions: {
@@ -77,6 +77,7 @@ export const useInputsState = defineStore({
     drawBins(ctx: CanvasRenderingContext2D) {
       this.data.bins.forEach((bin) => bin.draw(ctx));
     },
+
     drawManips(ctx: CanvasRenderingContext2D) {
       this.data.manipulators.forEach((manip) => manip.draw(ctx));
     },
