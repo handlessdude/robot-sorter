@@ -95,7 +95,8 @@ function animate() {
   /*all the drawings go here*/
   lineState.line.draw(ctx);
   trafficState.drawTraffic(ctx);
-
+  inputsState.drawBins(ctx);
+  inputsState.drawManips(ctx);
   ctx.restore();
 
   animFrameReqID = window.requestAnimationFrame(animate);

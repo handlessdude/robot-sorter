@@ -44,22 +44,23 @@ export const useInputsState = defineStore({
       console.log(res);
       return res;
     },
-    itemsLen: (state) => state.data.items.length,
+    binsLen: (state) => state.data.bins.length,
   },
 
   actions: {
-    placeNewManip(x: number, y: number) {
+    pushNewManip(x: number, y: number) {
       this.data.manipulators.push(
         new Manipulator(hri.random(), this.data.activityR, { x, y })
       );
     },
-    placeNewBin(x: number, y: number) {
+    pushNewBin(x: number, y: number) {
       const nextType = this.nextTypeToPlaceBin;
       if (!nextType) {
         return;
       }
       this.data.bins.push(new Bin({ x, y }, nextType as ItemType, 0));
     },
+
     startSimulation() {
       if (this.isValid) {
         this.submitted = true;
@@ -71,6 +72,13 @@ export const useInputsState = defineStore({
     endSimulation() {
       this.error = "";
       this.submitted = false;
+    },
+
+    drawBins(ctx: CanvasRenderingContext2D) {
+      this.data.bins.forEach((bin) => bin.draw(ctx));
+    },
+    drawManips(ctx: CanvasRenderingContext2D) {
+      this.data.manipulators.forEach((manip) => manip.draw(ctx));
     },
   },
 });

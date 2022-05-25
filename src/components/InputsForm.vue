@@ -1,31 +1,52 @@
 <script setup lang="ts">
 import { useInputsState } from "@/stores/inputsState";
+import { worldConstants } from "@/stupidConstants/worldConstants";
 import { ref, watch, type Ref } from "vue";
 const inputs = useInputsState();
+let worldCanvas: HTMLCanvasElement;
+
 enum InputMode {
   MANIPS = "manips",
   BINS = "bins",
   NONE = "none",
 }
+/*ну простите за костыль мне надоело делать ифы*/
+watch(
+  () => inputs.binsLen,
+  () => {
+    if (inputs.binsLen === inputs.data.items.length) {
+      inputMode.value = InputMode.NONE;
+    }
+  }
+);
 const inputMode: Ref<InputMode> = ref(InputMode.NONE);
-watch(inputMode, () => {
-  console.log(inputMode.value);
-});
 const toggleInputMode = (mode: InputMode) => {
-  // console.log(inputMode.value, mode);
-  // if (inputMode.value == InputMode.NONE) {
-  //   inputMode.value = mode;
-  // }
-
   if (inputMode.value === InputMode.NONE) {
+    worldCanvas = document.getElementById("worldCanvas") as HTMLCanvasElement;
+    worldCanvas.addEventListener("click", placeEntity, false);
     inputMode.value = mode;
     return;
   }
   if (inputMode.value === mode) {
     inputMode.value = InputMode.NONE;
+    worldCanvas.removeEventListener("click", placeEntity);
     return;
   }
 };
+
+function placeEntity(event: MouseEvent) {
+  const canvasLeft = worldCanvas.offsetLeft + worldCanvas.clientLeft,
+    canvasTop = worldCanvas.offsetTop + worldCanvas.clientTop;
+  const x = event.pageX - canvasLeft;
+  const y = event.pageY - canvasTop - worldConstants.HEADER_OFFSET;
+  if (inputMode.value === InputMode.MANIPS) {
+    inputs.pushNewManip(x, y);
+    return;
+  }
+  if (inputMode.value === InputMode.BINS) {
+    inputs.pushNewBin(x, y);
+  }
+}
 </script>
 
 <template>
@@ -228,6 +249,7 @@ const toggleInputMode = (mode: InputMode) => {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 2rem;
 }
 .inputs-form.card {
   padding: 0 1.3rem 1.3rem 1.3rem;
