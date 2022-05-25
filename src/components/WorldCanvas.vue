@@ -20,9 +20,6 @@ let animFrameReqID: number;
 let model: cocoSsd.ObjectDetection;
 const modelLoaded = ref(false);
 
-const manipsInput = ref(false);
-const binsInput = ref(false);
-
 onMounted(() => {
   cocoSsd.load({ base: "lite_mobilenet_v2" }).then(function (loadedModel) {
     model = loadedModel;

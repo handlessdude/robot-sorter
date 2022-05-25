@@ -36,17 +36,15 @@ export const useInputsState = defineStore({
       ),
     errorEmpty: (state) => state.error === "",
     nextTypeToPlaceBin: (state) => {
-      state.data.items.forEach((itemType) => {
-        if (
-          !state.data.bins.find(
-            (bin) => bin.itemType === (itemType as ItemType)
-          )
-        ) {
-          return itemType;
-        }
-      });
-      return null;
+      const res = state.data.items.find(
+        // вернем первый item из массива
+        (item) =>
+          !state.data.bins.some((bin) => bin.itemType === (item as ItemType)) //для котороого нет корзины
+      );
+      console.log(res);
+      return res;
     },
+    itemsLen: (state) => state.data.items.length,
   },
 
   actions: {

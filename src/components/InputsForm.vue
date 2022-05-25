@@ -1,6 +1,31 @@
 <script setup lang="ts">
 import { useInputsState } from "@/stores/inputsState";
+import { ref, watch, type Ref } from "vue";
 const inputs = useInputsState();
+enum InputMode {
+  MANIPS = "manips",
+  BINS = "bins",
+  NONE = "none",
+}
+const inputMode: Ref<InputMode> = ref(InputMode.NONE);
+watch(inputMode, () => {
+  console.log(inputMode.value);
+});
+const toggleInputMode = (mode: InputMode) => {
+  // console.log(inputMode.value, mode);
+  // if (inputMode.value == InputMode.NONE) {
+  //   inputMode.value = mode;
+  // }
+
+  if (inputMode.value === InputMode.NONE) {
+    inputMode.value = mode;
+    return;
+  }
+  if (inputMode.value === mode) {
+    inputMode.value = InputMode.NONE;
+    return;
+  }
+};
 </script>
 
 <template>
@@ -138,18 +163,28 @@ const inputs = useInputsState();
 
       <div class="control-btns">
         <button
-          class="btn manips"
-          :disabled="inputs.submitted"
-          @click="inputs.startSimulation"
+          id="manips"
+          class="btn picking manips"
+          :disabled="inputs.submitted || inputMode === InputMode.BINS"
+          @click="() => toggleInputMode(InputMode.MANIPS)"
         >
-          Pick manipulators
+          {{
+            inputMode === InputMode.MANIPS
+              ? "Stop picking"
+              : "Pick manipulators"
+          }}
         </button>
         <button
-          class="btn bins"
-          :disabled="inputs.submitted || !inputs.nextTypeToPlaceBin"
-          @click="inputs.endSimulation"
+          id="bins"
+          class="btn picking bins"
+          :disabled="
+            inputs.submitted ||
+            inputMode === InputMode.MANIPS ||
+            !inputs.nextTypeToPlaceBin //если нет бескорзинных типов предметов
+          "
+          @click="() => toggleInputMode(InputMode.BINS)"
         >
-          Pick bins
+          {{ inputMode === InputMode.BINS ? "Stop picking" : "Pick bins" }}
         </button>
       </div>
 
@@ -195,7 +230,7 @@ const inputs = useInputsState();
   align-items: center;
 }
 .inputs-form.card {
-  padding: 0 1.5rem 1.5rem 1.5rem;
+  padding: 0 1.3rem 1.3rem 1.3rem;
   display: flex;
   flex-direction: column;
   justify-content: center;

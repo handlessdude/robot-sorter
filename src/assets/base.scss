@@ -133,6 +133,14 @@ textarea#query{
   background: crimson;
   border-color: pink;
 }
+.picking.manips {
+  background: rgb(143, 80, 155);
+  border-color: rgb(176, 101, 191);
+}
+.picking.bins {
+  background: rgb(90, 170, 102);
+  border-color: rgb(91, 218, 110);
+}
 .btn:hover {
   cursor: pointer;
   opacity: 0.8;
