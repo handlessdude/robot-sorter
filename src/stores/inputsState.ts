@@ -65,8 +65,8 @@ export const useInputsState = defineStore({
       }
       this.data.bins.push(new Bin({ x, y }, nextType as ItemType, 0));
     },
-    removeBin(index: number) {
-      this.data.bins.splice(index, 1);
+    removeBin(bin_index: number) {
+      this.data.bins = this.data.bins.filter((_, i) => i != bin_index);
     },
 
     startSimulation() {
