@@ -53,12 +53,18 @@ export const useInputsState = defineStore({
         new Manipulator(hri.random(), this.data.activityR, { x, y })
       );
     },
+    removeManip(index: number) {
+      this.data.manipulators.splice(index, 1);
+    },
     pushNewBin(x: number, y: number) {
       const nextType = this.nextTypeToPlaceBin;
       if (!nextType) {
         return;
       }
       this.data.bins.push(new Bin({ x, y }, nextType as ItemType, 0));
+    },
+    removeBin(index: number) {
+      this.data.bins.splice(index, 1);
     },
 
     startSimulation() {
