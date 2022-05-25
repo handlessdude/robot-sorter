@@ -53,8 +53,10 @@ export const useInputsState = defineStore({
         new Manipulator(hri.random(), this.data.activityR, { x, y })
       );
     },
-    removeManip(index: number) {
-      this.data.manipulators.splice(index, 1);
+    removeManip(manip_id: number) {
+      this.data.manipulators = this.data.manipulators.filter(
+        (m) => m.id != manip_id
+      );
     },
     pushNewBin(x: number, y: number) {
       const nextType = this.nextTypeToPlaceBin;

@@ -50,30 +50,18 @@ function placeEntity(event: MouseEvent) {
   const x = event.pageX - canvasLeft;
   const y = event.pageY - canvasTop - worldConstants.HEADER_OFFSET;
   if (inputMode.value === InputMode.MANIPS) {
-    let index = -1;
-    let current_index = 0;
-    inputs.data.manipulators.forEach((manip) => {
+    let found_manip = inputs.data.manipulators.find((manip) => {
       const dist = Math.sqrt(
         Math.pow(x - manip.coordinates.x, 2) +
           Math.pow(y - manip.coordinates.y, 2)
       );
-      if (dist <= manip.size_radius) {
-        index = current_index;
-      }
-      current_index++;
+      return dist <= manip.size_radius;
     });
-    console.log("Удаляем вершину? " + (index != -1));
-    console.log(
-      "Манипуляторов до удаления = " + inputs.data.manipulators.length
-    );
-    if (index >= 0) {
-      inputs.removeManip(index);
-      console.log(
-        "Манипуляторов после удаления = " + inputs.data.manipulators.length
-      );
-      return;
+    if (!found_manip) {
+      inputs.pushNewManip(x, y);
+    } else {
+      inputs.removeManip(found_manip.id);
     }
-    inputs.pushNewManip(x, y);
     return;
   }
   if (inputMode.value === InputMode.BINS) {
