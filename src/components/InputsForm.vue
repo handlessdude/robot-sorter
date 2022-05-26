@@ -3,6 +3,7 @@ import { useInputsState } from "@/stores/inputsState";
 import { useLineState } from "@/stores/lineState";
 import { useTrafficState } from "@/stores/trafficState";
 import { worldConstants } from "@/stupidConstants/worldConstants";
+import { distance } from "@/utils/utils";
 import { ref, watch, type Ref } from "vue";
 const inputs = useInputsState();
 const lineState = useLineState();
@@ -64,10 +65,11 @@ function placeEntity(event: MouseEvent) {
 
   if (inputMode.value === InputMode.MANIPS) {
     let found_manip = inputs.data.manipulators.find((manip) => {
-      const dist = Math.sqrt(
-        Math.pow(x - manip.coordinates.x, 2) +
-          Math.pow(y - manip.coordinates.y, 2)
-      );
+      // const dist = Math.sqrt(
+      //   Math.pow(x - manip.coordinates.x, 2) +
+      //     Math.pow(y - manip.coordinates.y, 2)
+      // );
+      const dist = distance(manip.coordinates, { x, y });
       return dist <= manip.size_radius;
     });
     if (!found_manip) {

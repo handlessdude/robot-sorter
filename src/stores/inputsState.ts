@@ -29,9 +29,8 @@ export const useInputsState = defineStore({
     isValid: (state) =>
       Object.values(state.data).reduce(
         (validity, value) =>
-          (Array.isArray(value)
-            ? isNotEmpty(value)
-            : /*isPositive(value)*/ true) && validity,
+          (Array.isArray(value) ? isNotEmpty(value) : isPositive(value)) &&
+          validity,
         true
       ),
     errorEmpty: (state) => state.error === "",

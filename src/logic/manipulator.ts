@@ -10,7 +10,7 @@ export class Manipulator {
   readonly coordinates: IPoint;
   readonly size_radius: number;
   color: string;
-
+  strokeColor: string;
   bins: Array<Bin>;
   _currentBearingAngle: number;
   _currentDrivePlace: number;
@@ -31,7 +31,8 @@ export class Manipulator {
     radius: number,
     coordinates: IPoint,
     size_radius = 25,
-    color = "#8f509b"
+    color = worldConstants.MANIP_COLORS.FILL_COLOR,
+    strokeColor = worldConstants.MANIP_COLORS.STROKE_COLOR
   ) {
     this.id = id;
     this.radius = radius;
@@ -42,6 +43,7 @@ export class Manipulator {
     this.holdedItem = undefined;
     this.size_radius = size_radius;
     this.color = color;
+    this.strokeColor = strokeColor;
   }
 
   findBins(bins: Array<Bin>): void {
@@ -113,7 +115,7 @@ export class Manipulator {
   draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = this.color;
     ctx.lineWidth = 5;
-    ctx.strokeStyle = "#003300";
+    ctx.strokeStyle = this.strokeColor;
 
     const circle = new Path2D();
     circle.arc(
@@ -127,21 +129,5 @@ export class Manipulator {
 
     ctx.fill(circle);
     ctx.stroke(circle);
-
-    // ctx.beginPath();
-    // ctx.arc(
-    //   this.coordinates.x,
-    //   this.coordinates.y,
-    //   this.size_radius,
-    //   0,
-    //   2 * Math.PI,
-    //   false
-    // );
-    // ctx.fillStyle = this.color;
-    // ctx.fill();
-
-    // ctx.lineWidth = 5;
-    // ctx.strokeStyle = "#003300";
-    // ctx.stroke();
   }
 }

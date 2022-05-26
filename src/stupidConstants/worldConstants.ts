@@ -6,4 +6,12 @@ export const worldConstants = {
   IMG_SCALE_QUOTIENT: 0.2,
   ITEM_VELOCITY_DELTA: 2,
   GRAB_DISTANCE: 1,
+  MANIP_COLORS: {
+    FILL_COLOR: "#B065BF",
+    STROKE_COLOR: "#8f509b",
+  },
+  BIN_COLORS: {
+    FILL_COLOR: "#5BDA6E",
+    STROKE_COLOR: "#5AAA66",
+  },
 };
