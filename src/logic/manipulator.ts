@@ -204,6 +204,33 @@ export class Manipulator {
     }
   }
 
+  // получить все предметы в радиусе
+  getItemsInRadius(items: Array<IItem>): Array<IItem> {
+    return items.filter(
+      (item: IItem) =>
+        distance(item.coordinates, this.coordinates) <= this.radius
+    );
+  }
+
+  lastTime(item: IItem, lineVelocity: number): number {
+    //сначала получим координаты пересечения окружности манипа и движения предмета
+    // item должен быть в радиусе
+    const y =
+      Math.max(
+        Math.sqrt(
+          this.radius - Math.pow(item.coordinates.x - this.coordinates.x, 2)
+        ),
+        -Math.sqrt(
+          this.radius - Math.pow(item.coordinates.x - this.coordinates.x, 2)
+        )
+      ) + this.coordinates.y;
+    //непонятно как корень работает
+    //+ система с (0, 0) в левом верхнем углу, поэтому max
+
+    //Теперь высчитываем время
+    return (y - item.coordinates.y) / lineVelocity;
+  }
+
   // Запускать в каждом кадре для изменения параметров
   update(bearingVelocity: number, driveVelocity: number): void {
     // thinking
