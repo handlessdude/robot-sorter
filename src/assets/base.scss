@@ -69,9 +69,6 @@ main {
   right:0;
   left:0;
   bottom: 0;
-  .inputs-overlay{
-    margin-left: 5rem;
-  }
 }
 
 input,
@@ -103,16 +100,20 @@ textarea:disabled{
   background: var(--white);
   padding: 1.5rem;
 }
-
+small {
+color: crimson;
+}
 textarea#query{
   height: 4rem;
   margin-bottom: 1rem;
 }
 .btn {
   color: white;
+  display: flex;
   place-content: center;
   place-items: center;
-  width: 15rem;
+  text-align: center;
+  width: 12rem;
   border-radius: 99px;
   letter-spacing: 0.05em;
   border: 1px solid var(--greeny);
@@ -125,7 +126,18 @@ textarea#query{
   background: var(--header-color);
   transition: all 0.22s;
 }
-
+.btn.stop{
+  background: crimson;
+  border-color: pink;
+}
+.picking.manips {
+  background: rgb(143, 80, 155);
+  border-color: rgb(176, 101, 191);
+}
+.picking.bins {
+  background: rgb(90, 170, 102);
+  border-color: rgb(91, 218, 110);
+}
 .btn:hover {
   cursor: pointer;
   opacity: 0.8;

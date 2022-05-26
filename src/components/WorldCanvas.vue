@@ -1,34 +1,63 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 import { useTrafficState } from "@/stores/trafficState";
+import { useInputsState } from "@/stores/inputsState";
+import { useLineState } from "@/stores/lineState";
 import "@tensorflow/tfjs-backend-cpu";
 import "@tensorflow/tfjs-backend-webgl";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
+
 /*TODO REFACTOR INTO STORE*/
+const inputsState = useInputsState();
+const lineState = useLineState();
 const trafficState = useTrafficState();
+
 let worldCanvas: HTMLCanvasElement;
-let genNewImgInterval: number;
+let genImgReqID: number;
+let animFrameReqID: number;
+
 let model: cocoSsd.ObjectDetection;
+const modelLoaded = ref(false);
 
 onMounted(() => {
   cocoSsd.load({ base: "lite_mobilenet_v2" }).then(function (loadedModel) {
     model = loadedModel;
-    console.log(model);
-
+    modelLoaded.value = true;
     worldCanvas = document.getElementById("worldCanvas") as HTMLCanvasElement;
-    console.log(worldCanvas);
 
-    animate();
-    genNewImgInterval = setInterval(
-      trafficState.genNewImg,
-      worldConstants.ITEM_GEN_TIMESPAN
-    );
+    worldCanvas.height = window.innerHeight - worldConstants.HEADER_OFFSET;
+    worldCanvas.width = worldConstants.WORLD_CANVAS_WIDTH;
+
+    //line = new Line(worldCanvas.width * 0.5, worldCanvas.width * 0.7);
+    const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
+    ctx.save();
+    lineState.line.draw(ctx);
+    ctx.restore();
+
+    console.log("Model and canvas are ready!");
   });
 });
-onUnmounted(() => {
-  clearInterval(genNewImgInterval);
-});
+watch(
+  () => inputsState.submitted && modelLoaded.value,
+  (condition) => {
+    if (condition) {
+      /*if no model request model and so on if we actually will use model*/
+      animate();
+      genImgReqID = setInterval(
+        trafficState.genNewImg,
+        worldConstants.ITEM_GEN_TIMESPAN
+      );
+    } else {
+      clear();
+    }
+  }
+);
+
+function clear() {
+  window.cancelAnimationFrame(animFrameReqID);
+  window.clearInterval(genImgReqID);
+}
 
 function animate() {
   if (!model) {
@@ -42,7 +71,10 @@ function animate() {
       item.coordinates.y < window.innerHeight - worldConstants.HEADER_OFFSET,
     (item) => ({
       ...item,
-      y: item.coordinates.y + worldConstants.ITEM_VELOCITY_DELTA,
+      coordinates: {
+        x: item.coordinates.x,
+        y: item.coordinates.y + worldConstants.ITEM_VELOCITY_DELTA,
+      },
     })
   );
   //console.log("current worldState.traffic.length", worldState.traffic.length);
@@ -61,11 +93,13 @@ function animate() {
   const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
   ctx.save();
   /*all the drawings go here*/
+  lineState.line.draw(ctx);
   trafficState.drawTraffic(ctx);
-
+  inputsState.drawBins(ctx);
+  inputsState.drawManips(ctx);
   ctx.restore();
 
-  window.requestAnimationFrame(animate);
+  animFrameReqID = window.requestAnimationFrame(animate);
 }
 </script>
 

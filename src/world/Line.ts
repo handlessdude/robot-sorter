@@ -1,3 +1,4 @@
+import { worldConstants } from "./../stupidConstants/worldConstants";
 import { lerp } from "@/utils/utils";
 export default class Line {
   x: number;
@@ -41,7 +42,7 @@ export default class Line {
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.lineWidth = 5;
-    ctx.strokeStyle = "white";
+    ctx.strokeStyle = "crimson";
 
     for (let i = 1; i <= this.laneCount - 1; i++) {
       const x = lerp(this.left, this.right, i / this.laneCount);

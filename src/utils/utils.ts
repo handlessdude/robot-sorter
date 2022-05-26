@@ -14,3 +14,15 @@ export function genImgPath(imgItem: string) {
 export function distance(a: IPoint, b: IPoint): number {
   return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
 }
+
+export function isNotEmpty(arr: Array<any>) {
+  return arr.length > 0;
+}
+
+export function isGreaterThan(num: number, threshold: number) {
+  return num > threshold;
+}
+
+export function isPositive(num: number) {
+  return isGreaterThan(num, 0);
+}

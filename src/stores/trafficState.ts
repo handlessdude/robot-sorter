@@ -15,26 +15,30 @@ export const useTrafficState = defineStore({
   actions: {
     genNewImg() {
       const inputsState = useInputsState();
-      if (inputsState.items.length === 0) {
+      if (inputsState.data.items.length === 0) {
         return;
       }
       const img = new Image();
       img.src = genImgPath(
-        inputsState.items[Math.floor(Math.random() * inputsState.items.length)]
+        inputsState.data.items[
+          Math.floor(Math.random() * inputsState.data.items.length)
+        ]
       );
       console.log(`Generating new image: ${getImgItem(img.src)}`);
-      this.traffic.push({
-        img,
-        item_type: getImgItem(img.src) as ItemType,
-        coordinates: {
-          x:
-            Math.random() *
-            (worldConstants.WORLD_CANVAS_WIDTH -
-              img.width * worldConstants.IMG_SCALE_QUOTIENT),
-          y: -img.height * worldConstants.IMG_SCALE_QUOTIENT,
-        },
-        holdedBy: undefined,
-      });
+      img.onload = () =>
+        this.traffic.push({
+          img,
+          item_type: getImgItem(img.src) as ItemType,
+          coordinates: {
+            x: Math.floor(
+              Math.random() *
+                (worldConstants.WORLD_CANVAS_WIDTH -
+                  img.width * worldConstants.IMG_SCALE_QUOTIENT)
+            ),
+            y: -Math.floor(img.height * worldConstants.IMG_SCALE_QUOTIENT),
+          },
+          holdedBy: undefined,
+        });
     },
     updateTraffic(
       filterPred: (item: IItem) => boolean,
@@ -44,7 +48,7 @@ export const useTrafficState = defineStore({
       //console.log("updated traffic = ", this.traffic);
     },
     drawTraffic(ctx: CanvasRenderingContext2D) {
-      this.traffic.forEach((item) => {
+      this.traffic.forEach((item) =>
         ctx.drawImage(
           item.img,
           0, // sx
@@ -55,8 +59,8 @@ export const useTrafficState = defineStore({
           item.coordinates.y, // dy
           Math.floor(item.img.width * worldConstants.IMG_SCALE_QUOTIENT), // dWidth
           Math.floor(item.img.height * worldConstants.IMG_SCALE_QUOTIENT) // dHeight
-        );
-      });
+        )
+      );
     },
   },
 });

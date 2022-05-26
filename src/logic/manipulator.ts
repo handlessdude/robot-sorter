@@ -1,17 +1,17 @@
 import type { IItem } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
-import type { IBin } from "@/types/bin";
-import { useTrafficState } from "@/stores/trafficState";
-import { useInputsState } from "@/stores/inputsState";
+import type { Bin } from "@/logic/bin";
 import { distance } from "@/utils/utils";
 import { worldConstants } from "@/stupidConstants/worldConstants";
-const inputState = useInputsState();
 
 export class Manipulator {
   readonly id: number;
   readonly radius: number;
   readonly coordinates: IPoint;
-  bins: Array<IBin>;
+  readonly size_radius: number;
+  color: string;
+
+  bins: Array<Bin>;
   _currentBearingAngle: number;
   _currentDrivePlace: number;
   holdedItem?: IItem;
@@ -26,19 +26,32 @@ export class Manipulator {
     else console.warn("The angle is in [0; 1]");
   }
 
-  constructor(id: number, radius: number, coordinates: IPoint) {
+  constructor(
+    id: number,
+    radius: number,
+    coordinates: IPoint,
+    size_radius = 25,
+    color = "#8f509b"
+  ) {
     this.id = id;
     this.radius = radius;
     this.coordinates = coordinates;
-    this.bins = <IBin[]>[];
+    this.bins = <Bin[]>[];
     this._currentBearingAngle = 0;
     this._currentDrivePlace = 0;
     this.holdedItem = undefined;
+    this.size_radius = size_radius;
+    this.color = color;
   }
 
-  findBins(): void {
+  findBins(bins: Array<Bin>): void {
     //манипуляторам придётся самим найти свои урны
-    for (const bin of inputState.$state.bins) {
+    // for (const bin of inputState.$state.data.bins) {
+    //   if (distance(bin.coordinates, this.coordinates) <= this.radius) {
+    //     this.bins.push(bin);
+    //   }
+    // }
+    for (const bin of bins) {
       if (distance(bin.coordinates, this.coordinates) <= this.radius) {
         this.bins.push(bin);
       }
@@ -71,7 +84,7 @@ export class Manipulator {
         worldConstants.GRAB_DISTANCE
       ) {
         if (bin.itemType == this.holdedItem!.item_type) {
-          bin.numberOfCorrect++;
+          bin.itemsPlaced++;
           // TODO ! delete this.holdedItem
           this.holdedItem = undefined;
         }
@@ -95,5 +108,40 @@ export class Manipulator {
   driveMoving(place: number): number {
     // Возвращает время, необходимое для выполнения
     return 0;
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = this.color;
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = "#003300";
+
+    const circle = new Path2D();
+    circle.arc(
+      this.coordinates.x,
+      this.coordinates.y,
+      this.size_radius,
+      0,
+      2 * Math.PI,
+      false
+    );
+
+    ctx.fill(circle);
+    ctx.stroke(circle);
+
+    // ctx.beginPath();
+    // ctx.arc(
+    //   this.coordinates.x,
+    //   this.coordinates.y,
+    //   this.size_radius,
+    //   0,
+    //   2 * Math.PI,
+    //   false
+    // );
+    // ctx.fillStyle = this.color;
+    // ctx.fill();
+
+    // ctx.lineWidth = 5;
+    // ctx.strokeStyle = "#003300";
+    // ctx.stroke();
   }
 }
