@@ -1,11 +1,22 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import ModalWindow from "@/components/ModalWindow.vue";
+import { ref } from "vue";
+const showModal = ref(false);
+const toggleModal = () => (showModal.value = !showModal.value);
+</script>
 
 <template>
   <header class="header">
-    <div class="controls">
+    <div class="info">
       <h1 class="header--title">ROBOT SORTER</h1>
     </div>
+    <div class="controls">
+      <h3 @click="toggleModal" class="focusable">Help</h3>
+    </div>
   </header>
+  <ModalWindow v-bind="{ showModal, toggleModal }">
+    <h2>Instructions</h2>
+  </ModalWindow>
 </template>
 
 <style lang="scss" scoped>
@@ -36,7 +47,7 @@
   //margin-right: auto;
 }
 
-.controls {
+.info {
   margin-right: auto;
   display: flex;
   align-items: center;

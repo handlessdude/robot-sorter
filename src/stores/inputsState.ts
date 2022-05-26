@@ -39,7 +39,7 @@ export const useInputsState = defineStore({
         (item) =>
           !state.data.bins.some((bin) => bin.itemType === (item as ItemType)) //для котороого нет корзины
       );
-      console.log(res);
+      //console.log(res);
       return res;
     },
     binsCount: (state) => state.data.bins.length,
