@@ -1,7 +1,9 @@
 import { worldConstants } from "@/stupidConstants/worldConstants";
 import type { ItemType } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
+import { hri } from "human-readable-ids";
 export class Bin {
+  readonly id: string;
   coordinates: IPoint;
   itemsPlaced: number;
   readonly itemType: ItemType;
@@ -18,6 +20,7 @@ export class Bin {
     color = worldConstants.BIN_COLORS.FILL_COLOR,
     strokeColor = worldConstants.BIN_COLORS.STROKE_COLOR
   ) {
+    this.id = hri.random();
     this.coordinates = coordinates;
     this.itemType = itemType;
     this.itemsPlaced = itemsPlaced;

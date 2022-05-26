@@ -3,7 +3,6 @@ import { Manipulator } from "@/logic/manipulator";
 import type { ItemType } from "@/types/itemTypes";
 import { isNotEmpty, isPositive } from "@/utils/utils";
 import { defineStore } from "pinia";
-import { hri } from "human-readable-ids";
 import { Bin } from "@/logic/bin";
 
 export const useInputsState = defineStore({
@@ -49,10 +48,10 @@ export const useInputsState = defineStore({
   actions: {
     pushNewManip(x: number, y: number) {
       this.data.manipulators.push(
-        new Manipulator(hri.random(), this.data.activityR, { x, y })
+        new Manipulator(this.data.activityR, { x, y })
       );
     },
-    removeManip(manip_id: number) {
+    removeManip(manip_id: string) {
       this.data.manipulators = this.data.manipulators.filter(
         (m) => m.id != manip_id
       );
@@ -64,8 +63,8 @@ export const useInputsState = defineStore({
       }
       this.data.bins.push(new Bin({ x, y }, nextType as ItemType, 0));
     },
-    removeBin(bin_index: number) {
-      this.data.bins = this.data.bins.filter((_, i) => i != bin_index);
+    removeBin(bin_id: string) {
+      this.data.bins = this.data.bins.filter((bin) => bin.id != bin_id);
     },
 
     startSimulation() {

@@ -3,9 +3,9 @@ import type { IPoint } from "@/types/point";
 import type { Bin } from "@/logic/bin";
 import { distance } from "@/utils/utils";
 import { worldConstants } from "@/stupidConstants/worldConstants";
-
+import { hri } from "human-readable-ids";
 export class Manipulator {
-  readonly id: number;
+  readonly id: string;
   readonly radius: number;
   readonly coordinates: IPoint;
   readonly size_radius: number;
@@ -27,14 +27,13 @@ export class Manipulator {
   }
 
   constructor(
-    id: number,
     radius: number,
     coordinates: IPoint,
     size_radius = 25,
     color = worldConstants.MANIP_COLORS.FILL_COLOR,
     strokeColor = worldConstants.MANIP_COLORS.STROKE_COLOR
   ) {
-    this.id = id;
+    this.id = hri.random();
     this.radius = radius;
     this.coordinates = coordinates;
     this.bins = <Bin[]>[];

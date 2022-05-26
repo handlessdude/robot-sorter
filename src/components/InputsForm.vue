@@ -81,17 +81,17 @@ function placeEntity(event: MouseEvent) {
   }
 
   if (inputMode.value === InputMode.BINS) {
-    let found_index = inputs.data.bins.findIndex((bin) => {
+    let found_bin = inputs.data.bins.find((bin) => {
       let dist1 = x - bin.coordinates.x;
       let dist2 = y - bin.coordinates.y;
       return (
         dist1 >= 0 && dist1 <= bin.width && dist2 >= 0 && dist2 <= bin.height
       );
     });
-    if (found_index == -1) {
+    if (!found_bin) {
       inputs.pushNewBin(x, y);
     } else {
-      inputs.removeBin(found_index);
+      inputs.removeBin(found_bin.id);
     }
   }
 }
