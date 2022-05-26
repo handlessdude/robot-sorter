@@ -26,9 +26,9 @@ watch(
     inputs.drawBins(ctx);
     inputs.drawManips(ctx);
 
-    if (inputs.binsCount === inputs.data.items.length) {
-      inputMode.value = InputMode.NONE;
-    }
+    // if (inputs.binsCount === inputs.data.items.length) {
+    //   inputMode.value = InputMode.NONE;
+    // }
   }
 );
 watch(
@@ -249,7 +249,8 @@ function placeEntity(event: MouseEvent) {
           :disabled="
             inputs.submitted ||
             inputMode === InputMode.MANIPS ||
-            !inputs.nextTypeToPlaceBin //если нет бескорзинных типов предметов
+            inputs.data.items.length === 0
+            //|| !inputs.nextTypeToPlaceBin //если нет бескорзинных типов предметов
           "
           @click="() => toggleInputMode(InputMode.BINS)"
         >
