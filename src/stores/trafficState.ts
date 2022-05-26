@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import type { ItemType, IItem } from "@/types/itemTypes";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 import { genImgPath, getImgItem } from "@/utils/utils";
+import { useLineState } from "./lineState";
 export const useTrafficState = defineStore({
   id: "worldState",
   //сюда пишется текущее состояние
@@ -25,15 +26,18 @@ export const useTrafficState = defineStore({
         ]
       );
       console.log(`Generating new image: ${getImgItem(img.src)}`);
+      const lineState = useLineState();
+      const x_left = lineState.line.left;
+      const width = lineState.line.width;
       img.onload = () =>
         this.traffic.push({
           img,
           item_type: getImgItem(img.src) as ItemType,
           coordinates: {
             x: Math.floor(
-              Math.random() *
-                (worldConstants.WORLD_CANVAS_WIDTH -
-                  img.width * worldConstants.IMG_SCALE_QUOTIENT)
+              x_left +
+                Math.random() *
+                  (width - img.width * worldConstants.IMG_SCALE_QUOTIENT)
             ),
             y: -Math.floor(img.height * worldConstants.IMG_SCALE_QUOTIENT),
           },

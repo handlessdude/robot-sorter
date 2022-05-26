@@ -3,7 +3,6 @@ import { Manipulator } from "@/logic/manipulator";
 import type { ItemType } from "@/types/itemTypes";
 import { isNotEmpty, isPositive } from "@/utils/utils";
 import { defineStore } from "pinia";
-import { hri } from "human-readable-ids";
 import { Bin } from "@/logic/bin";
 
 export const useInputsState = defineStore({
@@ -29,9 +28,8 @@ export const useInputsState = defineStore({
     isValid: (state) =>
       Object.values(state.data).reduce(
         (validity, value) =>
-          (Array.isArray(value)
-            ? isNotEmpty(value)
-            : /*isPositive(value)*/ true) && validity,
+          (Array.isArray(value) ? isNotEmpty(value) : isPositive(value)) &&
+          validity,
         true
       ),
     errorEmpty: (state) => state.error === "",
@@ -41,7 +39,7 @@ export const useInputsState = defineStore({
         (item) =>
           !state.data.bins.some((bin) => bin.itemType === (item as ItemType)) //для котороого нет корзины
       );
-      console.log(res);
+      //console.log(res);
       return res;
     },
     binsCount: (state) => state.data.bins.length,
@@ -50,7 +48,12 @@ export const useInputsState = defineStore({
   actions: {
     pushNewManip(x: number, y: number) {
       this.data.manipulators.push(
-        new Manipulator(hri.random(), this.data.activityR, { x, y })
+        new Manipulator(this.data.activityR, { x, y })
+      );
+    },
+    removeManip(manip_id: string) {
+      this.data.manipulators = this.data.manipulators.filter(
+        (m) => m.id != manip_id
       );
     },
     pushNewBin(x: number, y: number) {
@@ -59,6 +62,9 @@ export const useInputsState = defineStore({
         return;
       }
       this.data.bins.push(new Bin({ x, y }, nextType as ItemType, 0));
+    },
+    removeBin(bin_id: string) {
+      this.data.bins = this.data.bins.filter((bin) => bin.id != bin_id);
     },
 
     startSimulation() {

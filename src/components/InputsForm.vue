@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import { useInputsState } from "@/stores/inputsState";
+import { useLineState } from "@/stores/lineState";
+import { useTrafficState } from "@/stores/trafficState";
 import { worldConstants } from "@/stupidConstants/worldConstants";
+import { distance } from "@/utils/utils";
 import { ref, watch, type Ref } from "vue";
 const inputs = useInputsState();
+const lineState = useLineState();
+const trafficState = useTrafficState();
 let worldCanvas: HTMLCanvasElement;
 
 enum InputMode {
@@ -15,17 +20,25 @@ watch(
   () => inputs.data.bins.length,
   () => {
     const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
+    ctx.clearRect(0, 0, worldCanvas.width, worldCanvas.height);
+    lineState.line.draw(ctx);
+    trafficState.drawTraffic(ctx);
     inputs.drawBins(ctx);
+    inputs.drawManips(ctx);
 
-    if (inputs.binsCount === inputs.data.items.length) {
-      inputMode.value = InputMode.NONE;
-    }
+    // if (inputs.binsCount === inputs.data.items.length) {
+    //   inputMode.value = InputMode.NONE;
+    // }
   }
 );
 watch(
   () => inputs.data.manipulators.length,
   () => {
     const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
+    ctx.clearRect(0, 0, worldCanvas.width, worldCanvas.height);
+    lineState.line.draw(ctx);
+    trafficState.drawTraffic(ctx);
+    inputs.drawBins(ctx);
     inputs.drawManips(ctx);
   }
 );
@@ -49,12 +62,37 @@ function placeEntity(event: MouseEvent) {
     canvasTop = worldCanvas.offsetTop + worldCanvas.clientTop;
   const x = event.pageX - canvasLeft;
   const y = event.pageY - canvasTop - worldConstants.HEADER_OFFSET;
+
   if (inputMode.value === InputMode.MANIPS) {
-    inputs.pushNewManip(x, y);
+    let found_manip = inputs.data.manipulators.find((manip) => {
+      // const dist = Math.sqrt(
+      //   Math.pow(x - manip.coordinates.x, 2) +
+      //     Math.pow(y - manip.coordinates.y, 2)
+      // );
+      const dist = distance(manip.coordinates, { x, y });
+      return dist <= manip.size_radius;
+    });
+    if (!found_manip) {
+      inputs.pushNewManip(x, y);
+    } else {
+      inputs.removeManip(found_manip.id);
+    }
     return;
   }
+
   if (inputMode.value === InputMode.BINS) {
-    inputs.pushNewBin(x, y);
+    let found_bin = inputs.data.bins.find((bin) => {
+      let dist1 = x - bin.coordinates.x;
+      let dist2 = y - bin.coordinates.y;
+      return (
+        dist1 >= 0 && dist1 <= bin.width && dist2 >= 0 && dist2 <= bin.height
+      );
+    });
+    if (!found_bin) {
+      inputs.pushNewBin(x, y);
+    } else {
+      inputs.removeBin(found_bin.id);
+    }
   }
 }
 </script>
@@ -211,7 +249,8 @@ function placeEntity(event: MouseEvent) {
           :disabled="
             inputs.submitted ||
             inputMode === InputMode.MANIPS ||
-            !inputs.nextTypeToPlaceBin //если нет бескорзинных типов предметов
+            inputs.data.items.length === 0
+            //|| !inputs.nextTypeToPlaceBin //если нет бескорзинных типов предметов
           "
           @click="() => toggleInputMode(InputMode.BINS)"
         >

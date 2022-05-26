@@ -41,8 +41,10 @@ export default class Line {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = "rgb(164, 192, 222)";
+    ctx.fillRect(this.left, this.top, this.width, this.bottom * 2);
     ctx.lineWidth = 5;
-    ctx.strokeStyle = "crimson";
+    ctx.strokeStyle = "rgb(56, 61, 66)";
 
     for (let i = 1; i <= this.laneCount - 1; i++) {
       const x = lerp(this.left, this.right, i / this.laneCount);
