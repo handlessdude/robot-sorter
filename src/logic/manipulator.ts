@@ -17,6 +17,7 @@ export class Manipulator {
   readonly radius: number;
   readonly coordinates: IPoint;
   bins: Array<Bin>;
+  inBoundItems: Array<IItem>;
   _currentBearingAngle: number;
   _currentDrivePlaceScale: number;
   holdedItem?: IItem;
@@ -52,6 +53,7 @@ export class Manipulator {
     this.radius = radius;
     this.coordinates = coordinates;
     this.bins = <Bin[]>[];
+    this.inBoundItems = <IItem[]>[];
     this._currentBearingAngle = Math.PI;
     this._currentDrivePlaceScale = 0.5;
     this.holdedItem = undefined;
@@ -132,10 +134,13 @@ export class Manipulator {
   }
 
   // Возвращает время, необходимое для выполнения
-  bearingRotatingTime(radians: number, bearingVelocity: number): number {
+  bearingRotatingTime(
+    radians: number,
+    bearingVelocity: number,
+    startAngle = this.currentBearingAngle
+  ): number {
     return (
-      Math.abs(this.currentBearingAngle - toStandartRadianForm(radians)) /
-      bearingVelocity
+      Math.abs(startAngle - toStandartRadianForm(radians)) / bearingVelocity
     );
   }
 
@@ -176,11 +181,14 @@ export class Manipulator {
   }
 
   // Возвращает время, необходимое для выполнения
-  driveMovingTime(placeScale: number, driveVelocity: number): number {
+  driveMovingTime(
+    placeScale: number,
+    driveVelocity: number,
+    startPlaceScale = this.currentDrivePlaceScale
+  ): number {
     if (placeScale < 0 || placeScale > 1) return -1;
     return (
-      (this.radius * Math.abs(this.currentDrivePlaceScale - placeScale)) /
-      driveVelocity
+      (this.radius * Math.abs(startPlaceScale - placeScale)) / driveVelocity
     );
   }
 
@@ -213,7 +221,8 @@ export class Manipulator {
     );
   }
 
-  lastTime(item: IItem, lineVelocity: number): number {
+  // осталось времени до пересечения с кругом
+  itemTimeLeft(item: IItem, lineVelocity: number): number {
     //сначала получим координаты пересечения окружности манипа и движения предмета
     // item должен быть в радиусе
     const y =
@@ -232,6 +241,7 @@ export class Manipulator {
     return (y - item.coordinates.y) / lineVelocity;
   }
 
+  // поставить задачу движения до точки
   ST_moveToPoint(coordinates: IPoint): void {
     this.ST_moveDrive(this.radius / distance(coordinates, this.coordinates));
 
@@ -267,6 +277,82 @@ export class Manipulator {
     }
 
     this.ST_rotateBearing(angle);
+  }
+
+  // возвращает время, необходимое манипулятору для достижения точки
+  movingToPointTime(
+    coordinates: IPoint,
+    driveVelocity: number,
+    bearingVelocity: number,
+    startCoordinates = this.coordinates,
+    startDrivePlaceScale = this.currentDrivePlaceScale,
+    startAngle = this.currentBearingAngle
+  ): number {
+    const driveTime = this.driveMovingTime(
+      this.radius / distance(coordinates, startCoordinates),
+      driveVelocity,
+      startDrivePlaceScale
+    );
+
+    let angle = 0;
+    // невозможное условие, однако
+    // если манип с предметом на одной вертикали
+    if (coordinates.x == startCoordinates.x) {
+      // и предмет выше основания манипа
+      if (coordinates.y < startCoordinates.y) angle = Math.PI / 2;
+      // или ниже
+      else if (coordinates.y > startCoordinates.y) angle = Math.PI * 1.5;
+      // или ровно в основании манипа
+      else {
+        angle = startAngle;
+      }
+      // на одной горизонтали
+    } else if (coordinates.y == startCoordinates.y) {
+      // и предмет правее манипа
+      if (coordinates.x > startCoordinates.x) angle = 0;
+      // или левее
+      else if (coordinates.x < startCoordinates.x) angle = Math.PI;
+    } else {
+      const atanValue = Math.atan(
+        (coordinates.y - startCoordinates.y) /
+          (coordinates.x - startCoordinates.x)
+      );
+      if (coordinates.x < startCoordinates.x) {
+        angle = Math.PI + atanValue;
+      } else {
+        angle = atanValue;
+      }
+    }
+
+    const bearingTime = this.bearingRotatingTime(
+      angle,
+      bearingVelocity,
+      startAngle
+    );
+    return Math.max(driveTime, bearingTime);
+  }
+
+  // Добавляет в свой массив новые предметы и возвращает true, если появились новые предметы
+  updateItemsInBound(worldItems: Array<IItem>): boolean {
+    let flag = false;
+    for (const i of worldItems) {
+      if (this.inBoundItems.find((e) => e != i)) flag = true;
+      this.inBoundItems.push(i);
+    }
+    return flag;
+  }
+
+  // Время до предмета [от заданной точки]
+  timeToItem(): number {
+    return 0;
+  }
+
+  think(worldItems: Array<IItem>): void {
+    if (this.updateItemsInBound(worldItems)) {
+      //rethink
+    } else {
+      //continue work
+    }
   }
 
   //func(item: IItem): void | boolean {}
