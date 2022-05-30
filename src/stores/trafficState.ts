@@ -46,7 +46,7 @@ export const useTrafficState = defineStore({
     },
     updateTraffic(
       filterPred: (item: IItem) => boolean,
-      updateItem: (item: IItem) => IItem,
+      updateItem: (item: IItem) => IItem
     ) {
       this.traffic = this.traffic.filter(filterPred).map(updateItem);
       //console.log("updated traffic = ", this.traffic);

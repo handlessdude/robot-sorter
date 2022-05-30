@@ -75,6 +75,7 @@ export class Manipulator {
 
   findBins(bins: Array<Bin>): void {
     //манипуляторам придётся самим найти свои урны
+    this.bins = <Bin[]>[];
     // bins: inputState.$state.data.bins
     for (const bin of bins) {
       if (distance(bin.coordinates, this.coordinates) <= this.radius) {
@@ -230,6 +231,45 @@ export class Manipulator {
     //Теперь высчитываем время
     return (y - item.coordinates.y) / lineVelocity;
   }
+
+  ST_moveToPoint(coordinates: IPoint): void {
+    this.ST_moveDrive(this.radius / distance(coordinates, this.coordinates));
+
+    let angle = 0;
+    // невозможное условие, однако
+    // если манип с предметом на одной вертикали
+    if (coordinates.x == this.coordinates.x) {
+      // и предмет выше основания манипа
+      if (coordinates.y < this.coordinates.y) angle = Math.PI / 2;
+      // или ниже
+      else if (coordinates.y > this.coordinates.y) angle = Math.PI * 1.5;
+      // или ровно в основании манипа
+      else {
+        this.bearingTarget = undefined;
+        return;
+      }
+      // на одной горизонтали
+    } else if (coordinates.y == this.coordinates.y) {
+      // и предмет правее манипа
+      if (coordinates.x > this.coordinates.x) angle = 0;
+      // или левее
+      else if (coordinates.x < this.coordinates.x) angle = Math.PI;
+    } else {
+      const atanValue = Math.atan(
+        (coordinates.y - this.coordinates.y) /
+          (coordinates.x - this.coordinates.x)
+      );
+      if (coordinates.x < this.coordinates.x) {
+        angle = Math.PI + atanValue;
+      } else {
+        angle = atanValue;
+      }
+    }
+
+    this.ST_rotateBearing(angle);
+  }
+
+  //func(item: IItem): void | boolean {}
 
   // Запускать в каждом кадре для изменения параметров
   update(bearingVelocity: number, driveVelocity: number): void {
