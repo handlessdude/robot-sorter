@@ -6,9 +6,14 @@ export const worldConstants = {
   IMG_SCALE_QUOTIENT: 1,
   ITEM_VELOCITY: 2,
   GRAB_DISTANCE: 1,
+  MANIP_RADIUS: 25,
   MANIP_COLORS: {
     FILL_COLOR: "#B065BF",
     STROKE_COLOR: "#8f509b",
+  },
+  BIN_SIZE: {
+    WIDTH: 50,
+    HEIGHT: 100,
   },
   BIN_COLORS: {
     FILL_COLOR: "#5BDA6E",

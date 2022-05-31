@@ -2,6 +2,7 @@
 import { useInputsState } from "@/stores/inputsState";
 import { useLineState } from "@/stores/lineState";
 import { useTrafficState } from "@/stores/trafficState";
+import { drawConstants } from "@/stupidConstants/drawConstants";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 import { distance } from "@/utils/utils";
 import { ref, watch, type Ref } from "vue";
@@ -64,23 +65,89 @@ function placeEntity(event: MouseEvent) {
   const y = event.pageY - canvasTop - worldConstants.HEADER_OFFSET;
 
   if (inputMode.value === InputMode.MANIPS) {
+    //if user clicks on existing manip, we remove it
     let found_manip = inputs.data.manipulators.find((manip) => {
-      // const dist = Math.sqrt(
-      //   Math.pow(x - manip.coordinates.x, 2) +
-      //     Math.pow(y - manip.coordinates.y, 2)
-      // );
       const dist = distance(manip.coordinates, { x, y });
       return dist <= manip.size_radius;
     });
-    if (!found_manip) {
-      inputs.pushNewManip(x, y);
-    } else {
+    if (found_manip) {
       inputs.removeManip(found_manip.id);
+      return;
     }
+
+    //check whether user is trying to place new manip on the line
+    if (
+      x >=
+        lineState.line.left -
+          worldConstants.MANIP_RADIUS -
+          drawConstants.LINE_WIDTH &&
+      x <=
+        lineState.line.right +
+          worldConstants.MANIP_RADIUS +
+          drawConstants.LINE_WIDTH
+    )
+      return;
+
+    //check whether user is trying to place new manip outside canvas
+    if (
+      x <= worldConstants.MANIP_RADIUS + drawConstants.LINE_WIDTH ||
+      x >=
+        worldConstants.WORLD_CANVAS_WIDTH -
+          worldConstants.MANIP_RADIUS -
+          drawConstants.LINE_WIDTH ||
+      y <= worldConstants.MANIP_RADIUS + drawConstants.LINE_WIDTH ||
+      y >=
+        window.innerHeight -
+          worldConstants.HEADER_OFFSET -
+          worldConstants.MANIP_RADIUS -
+          drawConstants.LINE_WIDTH
+    )
+      return;
+
+    //check whether new manip might overlap any other manips and bins
+    //look for manips
+    found_manip = inputs.data.manipulators.find((manip) => {
+      const dist = distance(manip.coordinates, { x, y });
+      return dist <= 2 * manip.size_radius + drawConstants.LINE_WIDTH;
+    });
+    if (found_manip) return;
+
+    //look for bins
+    let found_bin = inputs.data.bins.find((bin) => {
+      let left_x_limit =
+        bin.coordinates.x -
+        worldConstants.MANIP_RADIUS -
+        drawConstants.LINE_WIDTH;
+      let right_x_limit =
+        bin.coordinates.x +
+        worldConstants.BIN_SIZE.WIDTH +
+        worldConstants.MANIP_RADIUS +
+        drawConstants.LINE_WIDTH;
+      let up_y_limit =
+        bin.coordinates.y -
+        worldConstants.MANIP_RADIUS -
+        drawConstants.LINE_WIDTH;
+      let down_y_limit =
+        bin.coordinates.y +
+        worldConstants.BIN_SIZE.HEIGHT +
+        worldConstants.MANIP_RADIUS +
+        drawConstants.LINE_WIDTH;
+      return (
+        x >= left_x_limit &&
+        x <= right_x_limit &&
+        y >= up_y_limit &&
+        y <= down_y_limit
+      );
+    });
+    if (found_bin) return;
+
+    //place new manip
+    inputs.pushNewManip(x, y);
     return;
   }
 
   if (inputMode.value === InputMode.BINS) {
+    //if user click on existing bin, we remove it
     let found_bin = inputs.data.bins.find((bin) => {
       let dist1 = x - bin.coordinates.x;
       let dist2 = y - bin.coordinates.y;
@@ -88,11 +155,91 @@ function placeEntity(event: MouseEvent) {
         dist1 >= 0 && dist1 <= bin.width && dist2 >= 0 && dist2 <= bin.height
       );
     });
-    if (!found_bin) {
-      inputs.pushNewBin(x, y);
-    } else {
+    if (found_bin) {
       inputs.removeBin(found_bin.id);
+      return;
     }
+
+    //check whether user is trying to place bin on the line
+    if (
+      x >=
+        lineState.line.left -
+          worldConstants.BIN_SIZE.WIDTH -
+          drawConstants.LINE_WIDTH &&
+      x <= lineState.line.right + drawConstants.LINE_WIDTH
+    )
+      return;
+
+    //check whether user is trying to place new manip outside canvas
+    if (
+      x <= drawConstants.LINE_WIDTH ||
+      x >=
+        worldConstants.WORLD_CANVAS_WIDTH -
+          worldConstants.BIN_SIZE.WIDTH -
+          drawConstants.LINE_WIDTH ||
+      y <= drawConstants.LINE_WIDTH ||
+      y >=
+        window.innerHeight -
+          worldConstants.HEADER_OFFSET -
+          worldConstants.BIN_SIZE.HEIGHT -
+          drawConstants.LINE_WIDTH
+    )
+      return;
+
+    //check whether new bin might overlap any other bins and manips
+    //look for bins
+    found_bin = inputs.data.bins.find((bin) => {
+      let left_x_limit =
+        bin.coordinates.x -
+        worldConstants.BIN_SIZE.WIDTH -
+        drawConstants.LINE_WIDTH;
+      let right_x_limit =
+        bin.coordinates.x +
+        worldConstants.BIN_SIZE.WIDTH +
+        drawConstants.LINE_WIDTH;
+      let up_y_limit =
+        bin.coordinates.y -
+        worldConstants.BIN_SIZE.HEIGHT -
+        drawConstants.LINE_WIDTH;
+      let down_y_limit =
+        bin.coordinates.y +
+        worldConstants.BIN_SIZE.HEIGHT +
+        drawConstants.LINE_WIDTH;
+      return (
+        x >= left_x_limit &&
+        x <= right_x_limit &&
+        y >= up_y_limit &&
+        y <= down_y_limit
+      );
+    });
+    if (found_bin) return;
+
+    //look for manips
+    let left_x_limit =
+      x - worldConstants.MANIP_RADIUS - drawConstants.LINE_WIDTH;
+    let right_x_limit =
+      x +
+      worldConstants.BIN_SIZE.WIDTH +
+      worldConstants.MANIP_RADIUS +
+      drawConstants.LINE_WIDTH;
+    let up_y_limit = y - worldConstants.MANIP_RADIUS - drawConstants.LINE_WIDTH;
+    let down_y_limit =
+      y +
+      worldConstants.BIN_SIZE.HEIGHT +
+      worldConstants.MANIP_RADIUS +
+      drawConstants.LINE_WIDTH;
+    let found_manip = inputs.data.manipulators.find((manip) => {
+      return (
+        manip.coordinates.x >= left_x_limit &&
+        manip.coordinates.x <= right_x_limit &&
+        manip.coordinates.y >= up_y_limit &&
+        manip.coordinates.y <= down_y_limit
+      );
+    });
+    if (found_manip) return;
+
+    //place new bin
+    inputs.pushNewBin(x, y);
   }
 }
 </script>
