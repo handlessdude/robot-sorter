@@ -121,6 +121,7 @@ export class Manipulator {
   tryThrowItem(): void | boolean {
     if (this.holdedItem == undefined) {
       return false;
+      //console.log(1);
     }
 
     this.holdedItem.holdedBy = undefined;
@@ -138,6 +139,7 @@ export class Manipulator {
           //  1
           //);
           this.holdedItem = undefined;
+          //console.log(2);
           return true;
         }
       }
@@ -146,8 +148,10 @@ export class Manipulator {
     if (isOnTraffic(this.getDriveCoordinates())) {
       this.holdedItem.holdedBy = undefined;
       this.holdedItem = undefined;
+      //console.log(3);
     }
 
+    //console.log(4);
     return false;
   }
 
