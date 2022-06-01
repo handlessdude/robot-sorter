@@ -194,6 +194,28 @@ export class Manipulator {
           this.currentBearingAngle -= bearingVelocity;
         }
       }
+    } else {
+      if (toUp) {
+        if (
+          bearingVelocity >
+          -this.bearingTarget + this.currentBearingAngle + WPI
+        ) {
+          this.currentBearingAngle = this.bearingTarget;
+          this.bearingTarget = undefined;
+        } else {
+          this.currentBearingAngle -= bearingVelocity;
+        }
+      } else {
+        if (
+          bearingVelocity >
+          this.bearingTarget - this.currentBearingAngle + WPI
+        ) {
+          this.currentBearingAngle = this.bearingTarget;
+          this.bearingTarget = undefined;
+        } else {
+          this.currentBearingAngle += bearingVelocity;
+        }
+      }
     }
   }
 
