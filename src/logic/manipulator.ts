@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import type { IItem } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
 import type { Bin } from "@/logic/bin";
@@ -351,10 +352,16 @@ export class Manipulator {
   // Добавляет в свой массив новые предметы и возвращает true, если появились новые предметы
   updateItemsInBound(worldItems: Array<IItem>): boolean {
     let flag = false;
-    for (const i of worldItems) {
-      if (this.inBoundItems.find((e) => e != i)) flag = true;
-      this.inBoundItems.push(i);
+    for (const item of worldItems) {
+      if (
+        distance(item.coordinates, this.coordinates) <= this.radius &&
+        !this.inBoundItems.find((e) => e != item)
+      ) {
+        flag = true;
+        this.inBoundItems.push(item);
+      }
     }
+    console.info(flag);
     return flag;
   }
 
