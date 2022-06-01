@@ -16,6 +16,11 @@ const toggleModal = () => (showModal.value = !showModal.value);
   </header>
   <ModalWindow v-bind="{ showModal, toggleModal }">
     <h2>Instructions</h2>
+    <li>Select objects items will appear on lines</li>
+    <li>Press "PICK MANIPULATORS" button and click on white space to place them, to delete them click again, Press "STOP PICKING" in the end</li>
+    <li>Press "PICK BINS" button and click on white space, to delete them click again, Press "STOP PICKING" in the end</li>
+    <li>One bin appears for each item in the order on the screen</li>
+    <li>To regulate speed of procesess use forms</li>
   </ModalWindow>
 </template>
 
