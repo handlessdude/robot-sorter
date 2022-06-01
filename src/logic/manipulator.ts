@@ -55,7 +55,7 @@ export class Manipulator {
     strokeColor = worldConstants.MANIP_COLORS.STROKE_COLOR
   ) {
     this.id = hri.random();
-    this.radius = 350; //radius;
+    this.radius = radius; //radius;
     this.coordinates = coordinates;
     this.bins = <Bin[]>[];
     this.inBoundItems = <IItem[]>[];

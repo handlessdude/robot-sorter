@@ -45,7 +45,7 @@ export class Bin {
     strokeColor = worldConstants.BIN_COLORS.STROKE_COLOR
   ): Promise<Bin> {
     const binPromise = new Promise<Bin>((resolve, reject) => {
-      let img = new Image();
+      const img = new Image();
       img.onload = () =>
         resolve(
           new Bin(

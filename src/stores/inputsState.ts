@@ -9,8 +9,8 @@ export const useInputsState = defineStore({
   id: "inputs",
   state: () => ({
     data: {
-      lineVelocity: 1,
-      activityR: 25,
+      lineVelocity: 2,
+      activityR: 600,
       bearingMaxVelocity: 20,
       driveMaxVelocity: 20,
       items: <string[]>[],

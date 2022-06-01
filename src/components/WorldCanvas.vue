@@ -61,9 +61,17 @@ function animate() {
       ...item,
       coordinates: {
         x: item.coordinates.x,
-        y: item.coordinates.y + worldConstants.ITEM_VELOCITY,
+        y: item.coordinates.y + inputsState.data.lineVelocity,
       },
     })
+  );
+  inputsState.data.manipulators.forEach((manip) =>
+    manip.update(
+      trafficState.traffic,
+      inputsState.data.lineVelocity,
+      inputsState.data.driveMaxVelocity,
+      inputsState.data.bearingMaxVelocity
+    )
   );
   //console.log("current worldState.traffic.length", worldState.traffic.length);
 
