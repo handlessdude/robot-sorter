@@ -119,13 +119,15 @@ export class Manipulator {
   }
 
   tryThrowItem(): void | boolean {
-    if (this.holdedItem == undefined) return false;
+    if (this.holdedItem == undefined) {
+      return false;
+    }
 
     this.holdedItem.holdedBy = undefined;
     // BINS MUST BE SPLITTED
     for (const bin of this.bins) {
       if (
-        distance(bin.coordinates, this.holdedItem.coordinates) <=
+        distance(bin.coordinates, this.getDriveCoordinates()) <=
         worldConstants.THROWING_DISTANCE
       ) {
         if (bin.itemType == this.holdedItem.item_type) {
@@ -477,6 +479,7 @@ export class Manipulator {
       () => {
         if (!this.tryThrowItem()) {
           //an impossible way
+          console.log("impossible");
         }
       }
     );
@@ -514,7 +517,8 @@ export class Manipulator {
           else return _prev;
         }, temparr[0]);
 
-        this.ST_deliverItem(choosedItem.item, choosedItem.coordinates);
+        if (this.holdedItem == undefined)
+          this.ST_deliverItem(choosedItem.item, choosedItem.coordinates);
       }
     } else {
       // update states due to the task list
