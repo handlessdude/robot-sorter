@@ -37,8 +37,7 @@ export class Manipulator {
   strokeColor: string;
 
   set currentBearingAngle(value: number) {
-    if (value >= 0 && value <= 2 * Math.PI) this._currentBearingAngle = value;
-    else console.warn("The angle is in [0; 2PI]");
+    this._currentBearingAngle = toStandartRadianForm(value);
   }
 
   get currentBearingAngle() {
@@ -421,7 +420,10 @@ export class Manipulator {
         startDrivePlaceScale,
         startAngle
       );
-      if (time <= tc.time) {
+
+      const itemTime = (sy - item.coordinates.y) / lineVelocity;
+
+      if (time <= itemTime) {
         return { time: time, coordinates: { x: item.coordinates.x, y: sy } };
       }
     }

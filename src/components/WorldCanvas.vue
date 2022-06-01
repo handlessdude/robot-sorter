@@ -65,14 +65,7 @@ function animate() {
       },
     })
   );
-  inputsState.data.manipulators.forEach((manip) =>
-    manip.update(
-      trafficState.traffic,
-      inputsState.data.lineVelocity,
-      inputsState.data.driveMaxVelocity,
-      inputsState.data.bearingMaxVelocity
-    )
-  );
+
   //console.log("current worldState.traffic.length", worldState.traffic.length);
 
   inputsState.updateManips(trafficState.traffic);
