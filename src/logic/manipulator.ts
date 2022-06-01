@@ -25,6 +25,10 @@ export class Manipulator {
   bearingTarget?: number;
   driveTarget?: number;
 
+  taskList: Array<Function>;
+  isActiveTask: boolean;
+  isNecessaryRecalc: boolean;
+
   // shiza
   readonly size_radius: number;
   color: string;
@@ -60,6 +64,10 @@ export class Manipulator {
 
     this.bearingTarget = undefined;
     this.driveTarget = undefined;
+
+    this.taskList = Array<Function>();
+    this.isActiveTask = false;
+    this.isNecessaryRecalc = false;
 
     // shiza
     this.size_radius = size_radius;
@@ -222,7 +230,10 @@ export class Manipulator {
   }
 
   // осталось времени до пересечения с кругом
-  itemTimeLeft(item: IItem, lineVelocity: number): number {
+  itemTimeCoordsLeft(
+    item: IItem,
+    lineVelocity: number
+  ): { time: number; coordinates: IPoint } {
     //сначала получим координаты пересечения окружности манипа и движения предмета
     // item должен быть в радиусе
     const y =
@@ -238,7 +249,10 @@ export class Manipulator {
     //+ система с (0, 0) в левом верхнем углу, поэтому max
 
     //Теперь высчитываем время
-    return (y - item.coordinates.y) / lineVelocity;
+    return {
+      time: (y - item.coordinates.y) / lineVelocity,
+      coordinates: { x: item.coordinates.x, y },
+    };
   }
 
   // поставить задачу движения до точки
@@ -277,6 +291,7 @@ export class Manipulator {
     }
 
     this.ST_rotateBearing(angle);
+    this.isActiveTask = true;
   }
 
   // возвращает время, необходимое манипулятору для достижения точки
@@ -342,25 +357,142 @@ export class Manipulator {
     return flag;
   }
 
-  // Время до предмета [от заданной точки]
-  timeToItem(): number {
-    return 0;
+  itemBelongs(item: IItem): Bin | undefined {
+    return this.bins.find((e) => e.itemType == item.item_type);
   }
 
-  think(worldItems: Array<IItem>): void {
-    if (this.updateItemsInBound(worldItems)) {
+  // Время до предмета [от заданной точки] + координаты
+  timeCoordsToItem(
+    item: IItem,
+    lineVelocity: number,
+    driveVelocity: number,
+    bearingVelocity: number,
+    startCoordinates = this.coordinates,
+    startDrivePlaceScale = this.currentDrivePlaceScale,
+    startAngle = this.currentBearingAngle
+  ): { time: number; coordinates: IPoint } {
+    const step = 1;
+    const tc = this.itemTimeCoordsLeft(item, lineVelocity);
+    const lastTime = this.movingToPointTime(
+      { x: item.coordinates.x, y: tc.coords.y },
+      driveVelocity,
+      bearingVelocity,
+      startCoordinates,
+      startDrivePlaceScale,
+      startAngle
+    );
+    if (lastTime > tc.time) {
+      return { time: -1, coordinates: { x: 0, y: 0 } };
+    }
+    for (let sy = item.coordinates.y; sy < tc.coordinates.y; sy += step) {
+      const time = this.movingToPointTime(
+        { x: item.coordinates.x, y: sy },
+        driveVelocity,
+        bearingVelocity,
+        startCoordinates,
+        startDrivePlaceScale,
+        startAngle
+      );
+      if (time <= tc.time) {
+        return { time: time, coordinates: { x: item.coordinates.x, y: sy } };
+      }
+    }
+    return {
+      time: lastTime,
+      coordinates: { x: tc.coordinates.x, y: tc.coordinates.y },
+    };
+  }
+
+  ST_deliverItem(
+    item: IItem,
+    venue: IPoint,
+    lineVelocity: number,
+    driveVelocity: number,
+    bearingVelocity: number
+  ): void {
+    //
+    this.ST_moveToPoint(venue);
+    this.taskList.push(
+      () => {
+        if (!this.driveTarget && !this.bearingTarget) this.isActiveTask = false;
+      },
+      () => this.tryTakeItem(item),
+      () => {
+        if (!this.holdedItem) {
+          this.taskList = Array<Function>();
+          this.isNecessaryRecalc = true;
+        }
+      },
+      () =>
+        this.ST_moveToPoint(
+          this.bins.find((e) => e.itemType == item.item_type)!.coordinates
+        ),
+      () => {
+        if (!this.driveTarget && !this.bearingTarget) this.isActiveTask = false;
+      },
+      () => {
+        if (!this.tryThrowItem()) {
+          //an impossible way
+        }
+      }
+    );
+  }
+
+  think(
+    worldItems: Array<IItem>,
+    lineVelocity: number,
+    driveVelocity: number,
+    bearingVelocity: number
+  ): void {
+    if (this.updateItemsInBound(worldItems) || this.isNecessaryRecalc) {
       //rethink
+      this.isNecessaryRecalc = false;
+      const temparr = this.inBoundItems
+        .filter((e) => this.itemBelongs(e))
+        .map((e) => ({
+          ...this.timeCoordsToItem(
+            e,
+            lineVelocity,
+            driveVelocity,
+            bearingVelocity
+          ),
+          item: e,
+        }));
+
+      if (temparr.length == 0) {
+        //SET A TASK
+      } else {
+        const choosedItem = temparr.reduce((_prev, _curr) => {
+          if (_curr.time < _prev.time) return _curr;
+          else return _prev;
+        }, temparr[0]);
+
+        this.ST_deliverItem(
+          choosedItem.item,
+          choosedItem.coordinates,
+          lineVelocity,
+          driveVelocity,
+          bearingVelocity
+        );
+      }
     } else {
-      //continue work
+      // update states due to the task list
+      if (this.taskList.length > 0) {
+        if (!this.isActiveTask) this.taskList.shift()!();
+        else this.taskList[0]();
+      }
     }
   }
 
-  //func(item: IItem): void | boolean {}
-
   // Запускать в каждом кадре для изменения параметров
-  update(bearingVelocity: number, driveVelocity: number): void {
+  update(
+    worldItems: Array<IItem>,
+    lineVelocity: number,
+    driveVelocity: number,
+    bearingVelocity: number
+  ): void {
     // thinking
-    //TODO:
+    this.think(worldItems, lineVelocity, driveVelocity, bearingVelocity);
     // choosing an action
     //TODO:
     // moving
