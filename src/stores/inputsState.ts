@@ -11,8 +11,8 @@ export const useInputsState = defineStore({
     data: {
       lineVelocity: 2,
       activityR: 600,
-      bearingMaxVelocity: 0.5,
-      driveMaxVelocity: 0.3,
+      bearingMaxVelocity: 0.02,
+      driveMaxVelocity: 0.02,
       items: <string[]>[],
       bins: <Bin[]>[],
       manipulators: <Manipulator[]>[],
