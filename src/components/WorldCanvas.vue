@@ -73,7 +73,7 @@ function animate() {
       ...item,
       coordinates: {
         x: item.coordinates.x,
-        y: item.coordinates.y + worldConstants.ITEM_VELOCITY_DELTA,
+        y: item.coordinates.y + worldConstants.ITEM_VELOCITY,
       },
     })
   );

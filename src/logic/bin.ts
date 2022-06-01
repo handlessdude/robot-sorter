@@ -2,6 +2,7 @@ import { worldConstants } from "@/stupidConstants/worldConstants";
 import type { ItemType } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
 import { hri } from "human-readable-ids";
+import { genImgPath, getImgItem } from "@/utils/utils";
 export class Bin {
   readonly id: string;
   coordinates: IPoint;
@@ -45,5 +46,28 @@ export class Bin {
 
     ctx.fill(binRect);
     ctx.stroke(binRect);
+
+    const img = new Image();
+    img.src = genImgPath(this.itemType);
+    img.onload = () =>
+      ctx.drawImage(
+        img,
+        0, // sx
+        0, // sy
+        img.width, // sWidth
+        img.height, // sHeight
+        Math.floor(
+          this.coordinates.x +
+            this.width / 2 -
+            (img.width * worldConstants.BIN_IMG_SCALE) / 2
+        ), //dx
+        Math.floor(
+          this.coordinates.y +
+            this.height / 2 -
+            (img.height * worldConstants.BIN_IMG_SCALE) / 2
+        ), // dy
+        Math.floor(img.width * worldConstants.BIN_IMG_SCALE), // dWidth
+        Math.floor(img.height * worldConstants.BIN_IMG_SCALE) // dHeight
+      );
   }
 }
