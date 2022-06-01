@@ -41,9 +41,17 @@ export class Manipulator {
     else console.warn("The angle is in [0; 2PI]");
   }
 
+  get currentBearingAngle() {
+    return this._currentBearingAngle;
+  }
+
   set currentDrivePlaceScale(value: number) {
     if (value >= 0 && value <= 1) this._currentDrivePlaceScale = value;
     else console.warn("The drive scale is in [0; 1]");
+  }
+
+  get currentDrivePlaceScale() {
+    return this._currentDrivePlaceScale;
   }
 
   constructor(
@@ -241,10 +249,12 @@ export class Manipulator {
     const y =
       Math.max(
         Math.sqrt(
-          this.radius - Math.pow(item.coordinates.x - this.coordinates.x, 2)
+          Math.pow(this.radius, 2) -
+            Math.pow(item.coordinates.x - this.coordinates.x, 2)
         ),
         -Math.sqrt(
-          this.radius - Math.pow(item.coordinates.x - this.coordinates.x, 2)
+          Math.pow(this.radius, 2) -
+            Math.pow(item.coordinates.x - this.coordinates.x, 2)
         )
       ) + this.coordinates.y;
     //непонятно как корень работает
@@ -253,13 +263,13 @@ export class Manipulator {
     //Теперь высчитываем время
     return {
       time: (y - item.coordinates.y) / lineVelocity,
-      coordinates: { x: item.coordinates.x, y },
+      coordinates: { x: item.coordinates.x, y: y },
     };
   }
 
   // поставить задачу движения до точки
   ST_moveToPoint(coordinates: IPoint): void {
-    this.ST_moveDrive(this.radius / distance(coordinates, this.coordinates));
+    this.ST_moveDrive(distance(coordinates, this.coordinates) / this.radius);
 
     let angle = 0;
     // невозможное условие, однако
@@ -285,6 +295,7 @@ export class Manipulator {
         (coordinates.y - this.coordinates.y) /
           (coordinates.x - this.coordinates.x)
       );
+      console.log("atan:", atanValue);
       if (coordinates.x < this.coordinates.x) {
         angle = Math.PI + atanValue;
       } else {
@@ -306,7 +317,7 @@ export class Manipulator {
     startAngle = this.currentBearingAngle
   ): number {
     const driveTime = this.driveMovingTime(
-      this.radius / distance(coordinates, startCoordinates),
+      distance(coordinates, startCoordinates) / this.radius,
       driveVelocity,
       startDrivePlaceScale
     );
@@ -346,22 +357,29 @@ export class Manipulator {
       bearingVelocity,
       startAngle
     );
+
     return Math.max(driveTime, bearingTime);
   }
 
   // Добавляет в свой массив новые предметы и возвращает true, если появились новые предметы
   updateItemsInBound(worldItems: Array<IItem>): boolean {
-    let flag = false;
+    const newInBoundItems = Array<IItem>();
+
     for (const item of worldItems) {
-      if (
-        distance(item.coordinates, this.coordinates) <= this.radius &&
-        !this.inBoundItems.find((e) => e != item)
-      ) {
-        flag = true;
-        this.inBoundItems.push(item);
+      if (distance(item.coordinates, this.coordinates) <= this.radius) {
+        newInBoundItems.push(item);
       }
     }
-    console.info(flag);
+
+    let flag = false;
+    //newInBoundItems.forEach(
+    //  (_curr) =>
+    //    (flag ||= this.inBoundItems.find((e) => e == _curr) == undefined)
+    //);
+
+    if (this.inBoundItems.length != newInBoundItems.length) flag = true;
+    this.inBoundItems = newInBoundItems;
+
     return flag;
   }
 
@@ -381,6 +399,7 @@ export class Manipulator {
   ): { time: number; coordinates: IPoint } {
     const step = 1;
     const tc = this.itemTimeCoordsLeft(item, lineVelocity);
+
     const lastTime = this.movingToPointTime(
       { x: item.coordinates.x, y: tc.coordinates.y },
       driveVelocity,
@@ -389,6 +408,7 @@ export class Manipulator {
       startDrivePlaceScale,
       startAngle
     );
+
     if (lastTime > tc.time) {
       return { time: -1, coordinates: { x: 0, y: 0 } };
     }
@@ -414,6 +434,7 @@ export class Manipulator {
   ST_deliverItem(item: IItem, venue: IPoint): void {
     //
     this.ST_moveToPoint(venue);
+    /*
     this.taskList.push(
       () => {
         if (!this.driveTarget && !this.bearingTarget) this.isActiveTask = false;
@@ -438,6 +459,7 @@ export class Manipulator {
         }
       }
     );
+    */
   }
 
   think(
@@ -450,7 +472,7 @@ export class Manipulator {
       //rethink
       this.isNecessaryRecalc = false;
       const temparr = this.inBoundItems
-        .filter((e) => this.itemBelongs(e))
+        .filter((e) => !!this.itemBelongs(e))
         .map((e) => ({
           ...this.timeCoordsToItem(
             e,
@@ -461,6 +483,8 @@ export class Manipulator {
           item: e,
         }));
 
+      //console.log(temparr[0]);
+
       if (temparr.length == 0) {
         //SET A TASK
       } else {
@@ -469,13 +493,9 @@ export class Manipulator {
           else return _prev;
         }, temparr[0]);
 
-        this.ST_deliverItem(
-          choosedItem.item,
-          choosedItem.coordinates,
-          lineVelocity,
-          driveVelocity,
-          bearingVelocity
-        );
+        console.log(choosedItem);
+
+        this.ST_deliverItem(choosedItem.item, choosedItem.coordinates);
       }
     } else {
       // update states due to the task list
