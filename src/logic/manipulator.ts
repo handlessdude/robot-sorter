@@ -97,7 +97,7 @@ export class Manipulator {
     this.bins = <Bin[]>[];
     // bins: inputState.$state.data.bins
     for (const bin of bins) {
-      if (distance(bin.coordinates, this.coordinates) <= this.radius) {
+      if (distance(bin.centerCoordinates, this.coordinates) <= this.radius) {
         this.bins.push(bin);
       }
     }
@@ -105,7 +105,7 @@ export class Manipulator {
 
   tryTakeItem(item: IItem): void | boolean {
     if (
-      distance(item.coordinates, this.getDriveCoordinates()) <=
+      distance(getItemCenter(item), this.getDriveCoordinates()) <=
         worldConstants.GRAB_DISTANCE &&
       this.holdedItem == undefined &&
       item.holdedBy == undefined
@@ -125,7 +125,7 @@ export class Manipulator {
     // BINS MUST BE SPLITTED
     for (const bin of this.bins) {
       if (
-        distance(bin.coordinates, this.holdedItem.coordinates) <=
+        distance(bin.centerCoordinates, getItemCenter(this.holdedItem)) <=
         worldConstants.THROWING_DISTANCE
       ) {
         if (bin.itemType == this.holdedItem.item_type) {
@@ -232,7 +232,7 @@ export class Manipulator {
   getItemsInRadius(items: Array<IItem>): Array<IItem> {
     return items.filter(
       (item: IItem) =>
-        distance(item.coordinates, this.coordinates) <= this.radius //было
+        distance(getItemCenter(item), this.coordinates) <= this.radius //было
       //distance(getItemCenter(item), this.coordinates) <= this.radius
     );
   }
@@ -244,15 +244,16 @@ export class Manipulator {
   ): { time: number; coordinates: IPoint } {
     //сначала получим координаты пересечения окружности манипа и движения предмета
     // item должен быть в радиусе
+    const coordinates = getItemCenter(item);
     const y =
       Math.max(
         Math.sqrt(
           Math.pow(this.radius, 2) -
-            Math.pow(item.coordinates.x - this.coordinates.x, 2)
+            Math.pow(coordinates.x - this.coordinates.x, 2)
         ),
         -Math.sqrt(
           Math.pow(this.radius, 2) -
-            Math.pow(item.coordinates.x - this.coordinates.x, 2)
+            Math.pow(coordinates.x - this.coordinates.x, 2)
         )
       ) + this.coordinates.y;
     //непонятно как корень работает
@@ -260,8 +261,8 @@ export class Manipulator {
 
     //Теперь высчитываем время
     return {
-      time: (y - item.coordinates.y) / lineVelocity,
-      coordinates: { x: item.coordinates.x, y: y },
+      time: (y - coordinates.y) / lineVelocity,
+      coordinates: { x: coordinates.x, y: y },
     };
   }
 
@@ -377,7 +378,7 @@ export class Manipulator {
     */
     //getItemCenter(item)
     const newInBoundItems = worldItems.filter(
-      (item) => distance(item.coordinates, this.coordinates) <= this.radius
+      (item) => distance(getItemCenter(item), this.coordinates) <= this.radius
     );
 
     let flag = false;
@@ -408,6 +409,7 @@ export class Manipulator {
   ): { time: number; coordinates: IPoint } {
     const step = 1;
     const tc = this.itemTimeCoordsLeft(item, lineVelocity);
+    const coordinates = getItemCenter(item);
 
     /*
     const lastTime = this.movingToPointTime(
@@ -424,9 +426,9 @@ export class Manipulator {
       return { time: -1, coordinates: { x: 0, y: 0 } };
     }
     */
-    for (let sy = item.coordinates.y; sy < tc.coordinates.y; sy += step) {
+    for (let sy = coordinates.y; sy < tc.coordinates.y; sy += step) {
       const time = this.movingToPointTime(
-        { x: item.coordinates.x, y: sy },
+        { x: coordinates.x, y: sy },
         driveVelocity,
         bearingVelocity,
         startCoordinates,
@@ -434,10 +436,10 @@ export class Manipulator {
         startAngle
       );
 
-      const itemTime = (sy - item.coordinates.y) / lineVelocity;
+      const itemTime = (sy - coordinates.y) / lineVelocity;
 
       if (time <= itemTime) {
-        return { time: time, coordinates: { x: item.coordinates.x, y: sy } };
+        return { time: time, coordinates: { x: coordinates.x, y: sy } };
       }
     }
     return {
@@ -466,7 +468,7 @@ export class Manipulator {
       },
       () =>
         this.ST_moveToPoint(
-          this.bins.find((e) => e.itemType == item.item_type)!.coordinates
+          this.bins.find((e) => e.itemType == item.item_type)!.centerCoordinates
         ),
       () => {
         if (this.driveTarget == undefined && this.bearingTarget == undefined)
