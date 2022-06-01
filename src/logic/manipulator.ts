@@ -105,7 +105,7 @@ export class Manipulator {
 
   tryTakeItem(item: IItem): void | boolean {
     if (
-      distance(item.coordinates, this.coordinates) <=
+      distance(item.coordinates, this.getDriveCoordinates()) <=
         worldConstants.GRAB_DISTANCE &&
       this.holdedItem == undefined &&
       item.holdedBy == undefined
@@ -203,7 +203,6 @@ export class Manipulator {
     driveVelocity: number,
     startPlaceScale = this.currentDrivePlaceScale
   ): number {
-    console.log(placeScale);
     if (placeScale < 0 || placeScale > 1) return -1;
     return Math.abs(startPlaceScale - placeScale) / driveVelocity;
   }
@@ -268,11 +267,6 @@ export class Manipulator {
 
   // поставить задачу движения до точки
   ST_moveToPoint(coordinates: IPoint): void {
-    console.log(
-      coordinates,
-      this.coordinates,
-      distance(coordinates, this.coordinates)
-    );
     this.ST_moveDrive(distance(coordinates, this.coordinates) / this.radius);
 
     let angle = 0;
@@ -362,7 +356,6 @@ export class Manipulator {
       startAngle
     );
 
-    console.log(driveTime, bearingTime);
     return Math.max(driveTime, bearingTime);
   }
 
@@ -455,17 +448,20 @@ export class Manipulator {
 
   ST_deliverItem(item: IItem, venue: IPoint): void {
     //
-    this.ST_moveToPoint(venue);
-    /*
     this.taskList.push(
+      () => this.ST_moveToPoint(venue),
       () => {
-        if (!this.driveTarget && !this.bearingTarget) this.isActiveTask = false;
+        if (this.driveTarget == undefined && this.bearingTarget == undefined) {
+          this.isActiveTask = false;
+        }
       },
       () => this.tryTakeItem(item),
       () => {
         if (!this.holdedItem) {
           this.taskList = Array<Function>();
           this.isNecessaryRecalc = true;
+        } else {
+          console.log(item);
         }
       },
       () =>
@@ -473,7 +469,8 @@ export class Manipulator {
           this.bins.find((e) => e.itemType == item.item_type)!.coordinates
         ),
       () => {
-        if (!this.driveTarget && !this.bearingTarget) this.isActiveTask = false;
+        if (this.driveTarget == undefined && this.bearingTarget == undefined)
+          this.isActiveTask = false;
       },
       () => {
         if (!this.tryThrowItem()) {
@@ -481,7 +478,6 @@ export class Manipulator {
         }
       }
     );
-    */
   }
 
   think(
@@ -514,15 +510,16 @@ export class Manipulator {
           else return _prev;
         }, temparr[0]);
 
-        console.log(choosedItem);
-
         this.ST_deliverItem(choosedItem.item, choosedItem.coordinates);
       }
     } else {
       // update states due to the task list
       if (this.taskList.length > 0) {
-        if (!this.isActiveTask) this.taskList.shift()!();
-        else this.taskList[0]();
+        do {
+          const preIsActive = this.isActiveTask;
+          this.taskList[0]();
+          if (!preIsActive) this.taskList.shift();
+        } while (this.taskList.length > 0 && !this.isActiveTask);
       }
     }
   }
