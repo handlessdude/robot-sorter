@@ -1,9 +1,9 @@
 import { useInputsState } from "./inputsState";
 import { defineStore } from "pinia";
 import type { ItemType, IItem } from "@/types/itemTypes";
-import { worldConstants } from "@/stupidConstants/worldConstants";
 import { genImgPath, getImgItem } from "@/utils/utils";
 import { useLineState } from "./lineState";
+import { drawConstants } from "@/stupidConstants/drawConstants";
 export const useTrafficState = defineStore({
   id: "trafficState",
   //сюда пишется текущее состояние
@@ -37,9 +37,12 @@ export const useTrafficState = defineStore({
             x: Math.floor(
               x_left +
                 Math.random() *
-                  (width - img.width * worldConstants.IMG_SCALE_QUOTIENT)
+                  (width -
+                    img.width * drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT)
             ),
-            y: -Math.floor(img.height * worldConstants.IMG_SCALE_QUOTIENT),
+            y: -Math.floor(
+              img.height * drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT
+            ),
           },
           holdedBy: undefined,
         });
@@ -61,8 +64,12 @@ export const useTrafficState = defineStore({
           item.img.height, // sHeight
           item.coordinates.x, // dx
           item.coordinates.y, // dy
-          Math.floor(item.img.width * worldConstants.IMG_SCALE_QUOTIENT), // dWidth
-          Math.floor(item.img.height * worldConstants.IMG_SCALE_QUOTIENT) // dHeight
+          Math.floor(
+            item.img.width * drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT
+          ), // dWidth
+          Math.floor(
+            item.img.height * drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT
+          ) // dHeight
         )
       );
     },

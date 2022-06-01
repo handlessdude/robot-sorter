@@ -66,7 +66,8 @@ function placeEntity(event: MouseEvent) {
   const canvasLeft = worldCanvas.offsetLeft + worldCanvas.clientLeft,
     canvasTop = worldCanvas.offsetTop + worldCanvas.clientTop;
   const x = event.pageX - canvasLeft;
-  const y = event.pageY - canvasTop - worldConstants.HEADER_OFFSET;
+  const y =
+    event.pageY - canvasTop - drawConstants.CANVAS_SETTINGS.HEADER_OFFSET;
 
   if (inputMode.value === InputMode.MANIPS) {
     //if user clicks on existing manip, we remove it
@@ -83,27 +84,31 @@ function placeEntity(event: MouseEvent) {
     if (
       x >=
         lineState.line.left -
-          worldConstants.MANIP_RADIUS -
+          drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS -
           drawConstants.LINE_WIDTH &&
       x <=
         lineState.line.right +
-          worldConstants.MANIP_RADIUS +
+          drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS +
           drawConstants.LINE_WIDTH
     )
       return;
 
     //check whether user is trying to place new manip outside canvas
     if (
-      x <= worldConstants.MANIP_RADIUS + drawConstants.LINE_WIDTH ||
-      x >=
-        worldConstants.WORLD_CANVAS_WIDTH -
-          worldConstants.MANIP_RADIUS -
+      x <=
+        drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS +
           drawConstants.LINE_WIDTH ||
-      y <= worldConstants.MANIP_RADIUS + drawConstants.LINE_WIDTH ||
+      x >=
+        drawConstants.CANVAS_SETTINGS.WORLD_CANVAS_WIDTH -
+          drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS -
+          drawConstants.LINE_WIDTH ||
+      y <=
+        drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS +
+          drawConstants.LINE_WIDTH ||
       y >=
         window.innerHeight -
-          worldConstants.HEADER_OFFSET -
-          worldConstants.MANIP_RADIUS -
+          drawConstants.CANVAS_SETTINGS.HEADER_OFFSET -
+          drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS -
           drawConstants.LINE_WIDTH
     )
       return;
@@ -120,21 +125,21 @@ function placeEntity(event: MouseEvent) {
     let found_bin = inputs.data.bins.find((bin) => {
       let left_x_limit =
         bin.coordinates.x -
-        worldConstants.MANIP_RADIUS -
+        drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS -
         drawConstants.LINE_WIDTH;
       let right_x_limit =
         bin.coordinates.x +
         worldConstants.BIN_SIZE.WIDTH +
-        worldConstants.MANIP_RADIUS +
+        drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS +
         drawConstants.LINE_WIDTH;
       let up_y_limit =
         bin.coordinates.y -
-        worldConstants.MANIP_RADIUS -
+        drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS -
         drawConstants.LINE_WIDTH;
       let down_y_limit =
         bin.coordinates.y +
         worldConstants.BIN_SIZE.HEIGHT +
-        worldConstants.MANIP_RADIUS +
+        drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS +
         drawConstants.LINE_WIDTH;
       return (
         x >= left_x_limit &&
@@ -178,13 +183,13 @@ function placeEntity(event: MouseEvent) {
     if (
       x <= drawConstants.LINE_WIDTH ||
       x >=
-        worldConstants.WORLD_CANVAS_WIDTH -
+        drawConstants.CANVAS_SETTINGS.WORLD_CANVAS_WIDTH -
           worldConstants.BIN_SIZE.WIDTH -
           drawConstants.LINE_WIDTH ||
       y <= drawConstants.LINE_WIDTH ||
       y >=
         window.innerHeight -
-          worldConstants.HEADER_OFFSET -
+          drawConstants.CANVAS_SETTINGS.HEADER_OFFSET -
           worldConstants.BIN_SIZE.HEIGHT -
           drawConstants.LINE_WIDTH
     )
@@ -220,17 +225,22 @@ function placeEntity(event: MouseEvent) {
 
     //look for manips
     let left_x_limit =
-      x - worldConstants.MANIP_RADIUS - drawConstants.LINE_WIDTH;
+      x -
+      drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS -
+      drawConstants.LINE_WIDTH;
     let right_x_limit =
       x +
       worldConstants.BIN_SIZE.WIDTH +
-      worldConstants.MANIP_RADIUS +
+      drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS +
       drawConstants.LINE_WIDTH;
-    let up_y_limit = y - worldConstants.MANIP_RADIUS - drawConstants.LINE_WIDTH;
+    let up_y_limit =
+      y -
+      drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS -
+      drawConstants.LINE_WIDTH;
     let down_y_limit =
       y +
       worldConstants.BIN_SIZE.HEIGHT +
-      worldConstants.MANIP_RADIUS +
+      drawConstants.MANIP_SETTINGS.MANIP_SIZE_RADIUS +
       drawConstants.LINE_WIDTH;
     let found_manip = inputs.data.manipulators.find((manip) => {
       return (

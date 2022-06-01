@@ -60,8 +60,8 @@ export class Manipulator {
 
     // shiza
     size_radius = 25,
-    color = drawConstants.MANIP_COLORS.FILL_COLOR,
-    strokeColor = drawConstants.MANIP_COLORS.STROKE_COLOR
+    color = drawConstants.MANIP_SETTINGS.MANIP_COLORS.FILL_COLOR,
+    strokeColor = drawConstants.MANIP_SETTINGS.MANIP_COLORS.STROKE_COLOR
   ) {
     this.id = hri.random();
     this.radius = radius; //radius;
@@ -565,14 +565,14 @@ export class Manipulator {
       this.currentBearingAngle
     );
     ctx.lineTo(p.x, p.y);
-    ctx.lineWidth = drawConstants.CRANE_PARAMS.LINE_WIDTH;
-    ctx.strokeStyle = drawConstants.CRANE_PARAMS.STROKE_COLOR;
+    ctx.lineWidth = drawConstants.MANIP_SETTINGS.CRANE_PARAMS.LINE_WIDTH;
+    ctx.strokeStyle = drawConstants.MANIP_SETTINGS.CRANE_PARAMS.STROKE_COLOR;
     ctx.stroke();
 
     //calculate and draw manipulator drive (RAYAN GOSLING)
-    ctx.fillStyle = drawConstants.DRIVE_PARAMS.FILL_COLOR;
-    ctx.lineWidth = drawConstants.DRIVE_PARAMS.LINE_WIDTH;
-    ctx.strokeStyle = drawConstants.DRIVE_PARAMS.STROKE_COLOR;
+    ctx.fillStyle = drawConstants.MANIP_SETTINGS.DRIVE_PARAMS.FILL_COLOR;
+    ctx.lineWidth = drawConstants.MANIP_SETTINGS.DRIVE_PARAMS.LINE_WIDTH;
+    ctx.strokeStyle = drawConstants.MANIP_SETTINGS.DRIVE_PARAMS.STROKE_COLOR;
     const drive = new Path2D();
     p = getMovedPoint(
       this.coordinates,
@@ -582,7 +582,7 @@ export class Manipulator {
     drive.arc(
       p.x,
       p.y,
-      drawConstants.DRIVE_PARAMS.RADIUS,
+      drawConstants.MANIP_SETTINGS.DRIVE_PARAMS.RADIUS,
       0,
       2 * Math.PI,
       false

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import { worldConstants } from "@/stupidConstants/worldConstants";
+import { drawConstants } from "@/stupidConstants/drawConstants";
 import { useTrafficState } from "@/stores/trafficState";
 import { useInputsState } from "@/stores/inputsState";
 import { useLineState } from "@/stores/lineState";
@@ -19,8 +20,9 @@ let animFrameReqID: number;
 onMounted(() => {
   window.onload = () => {
     worldCanvas = document.getElementById("worldCanvas") as HTMLCanvasElement;
-    worldCanvas.height = window.innerHeight - worldConstants.HEADER_OFFSET;
-    worldCanvas.width = worldConstants.WORLD_CANVAS_WIDTH;
+    worldCanvas.height =
+      window.innerHeight - drawConstants.CANVAS_SETTINGS.HEADER_OFFSET;
+    worldCanvas.width = drawConstants.CANVAS_SETTINGS.WORLD_CANVAS_WIDTH;
 
     //line = new Line(worldCanvas.width * 0.5, worldCanvas.width * 0.7);
     const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
@@ -56,7 +58,8 @@ function animate() {
   /*ALL THE UPDATINGS GO HERE*/
   trafficState.updateTraffic(
     (item) =>
-      item.coordinates.y < window.innerHeight - worldConstants.HEADER_OFFSET,
+      item.coordinates.y <
+      window.innerHeight - drawConstants.CANVAS_SETTINGS.HEADER_OFFSET,
     (item) => ({
       ...item,
       coordinates: {
@@ -70,8 +73,9 @@ function animate() {
   //console.log(inputsState.data.manipulators);
 
   //lol do not touch these LINES
-  worldCanvas.height = window.innerHeight - worldConstants.HEADER_OFFSET;
-  worldCanvas.width = worldConstants.WORLD_CANVAS_WIDTH;
+  worldCanvas.height =
+    window.innerHeight - drawConstants.CANVAS_SETTINGS.HEADER_OFFSET;
+  worldCanvas.width = drawConstants.CANVAS_SETTINGS.WORLD_CANVAS_WIDTH;
   //
 
   const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;

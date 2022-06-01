@@ -1,8 +1,8 @@
-import { worldConstants } from "@/stupidConstants/worldConstants";
 import type { ItemType } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
 import { hri } from "human-readable-ids";
 import { genImgPath, getImgItem } from "@/utils/utils";
+import { drawConstants } from "@/stupidConstants/drawConstants";
 
 export class Bin {
   readonly id: string;
@@ -21,8 +21,8 @@ export class Bin {
     itemsPlaced = 0,
     width = 50,
     height = 100,
-    color = worldConstants.BIN_COLORS.FILL_COLOR,
-    strokeColor = worldConstants.BIN_COLORS.STROKE_COLOR
+    color = drawConstants.BIN_SETTINGS.BIN_COLORS.FILL_COLOR,
+    strokeColor = drawConstants.BIN_SETTINGS.BIN_COLORS.STROKE_COLOR
   ) {
     this.id = hri.random();
     this.coordinates = coordinates;
@@ -41,8 +41,8 @@ export class Bin {
     itemsPlaced = 0,
     width = 50,
     height = 100,
-    color = worldConstants.BIN_COLORS.FILL_COLOR,
-    strokeColor = worldConstants.BIN_COLORS.STROKE_COLOR
+    color = drawConstants.BIN_SETTINGS.BIN_COLORS.FILL_COLOR,
+    strokeColor = drawConstants.BIN_SETTINGS.BIN_COLORS.STROKE_COLOR
   ): Promise<Bin> {
     const binPromise = new Promise<Bin>((resolve, reject) => {
       const img = new Image();
@@ -91,15 +91,15 @@ export class Bin {
       Math.floor(
         this.coordinates.x +
           this.width / 2 -
-          (this.img.width * worldConstants.BIN_IMG_SCALE) / 2
+          (this.img.width * drawConstants.BIN_SETTINGS.BIN_IMG_SCALE) / 2
       ), //dx
       Math.floor(
         this.coordinates.y +
           this.height / 2 -
-          (this.img.height * worldConstants.BIN_IMG_SCALE) / 2
+          (this.img.height * drawConstants.BIN_SETTINGS.BIN_IMG_SCALE) / 2
       ), // dy
-      Math.floor(this.img.width * worldConstants.BIN_IMG_SCALE), // dWidth
-      Math.floor(this.img.height * worldConstants.BIN_IMG_SCALE) // dHeight
+      Math.floor(this.img.width * drawConstants.BIN_SETTINGS.BIN_IMG_SCALE), // dWidth
+      Math.floor(this.img.height * drawConstants.BIN_SETTINGS.BIN_IMG_SCALE) // dHeight
     );
 
     //}
