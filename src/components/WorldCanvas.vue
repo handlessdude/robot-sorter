@@ -66,8 +66,6 @@ function animate() {
     })
   );
 
-  //console.log("current worldState.traffic.length", worldState.traffic.length);
-
   inputsState.updateManips(trafficState.traffic);
   //console.log(inputsState.data.manipulators);
 
