@@ -9,12 +9,10 @@ export const useInputsState = defineStore({
   id: "inputs",
   state: () => ({
     data: {
-      lineVelocity: 0,
-      activityR: 0,
-
-      bearingMaxVelocity: 0,
-      driveMaxVelocity: 0,
-      manipulatorCount: 0,
+      lineVelocity: 1,
+      activityR: 25,
+      bearingMaxVelocity: 20,
+      driveMaxVelocity: 20,
       items: <string[]>[],
       bins: <Bin[]>[],
       manipulators: <Manipulator[]>[],
@@ -56,12 +54,13 @@ export const useInputsState = defineStore({
         (m) => m.id != manip_id
       );
     },
-    pushNewBin(x: number, y: number) {
+    async pushNewBin(x: number, y: number) {
       const nextType = this.nextTypeToPlaceBin;
       if (!nextType) {
         return;
       }
-      this.data.bins.push(new Bin({ x, y }, nextType as ItemType, 0));
+      const newBin = await Bin.initialize({ x, y }, nextType as ItemType, 0);
+      this.data.bins.push(newBin);
     },
     removeBin(bin_id: string) {
       this.data.bins = this.data.bins.filter((bin) => bin.id != bin_id);
