@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import type { IItem } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
 import type { Bin } from "@/logic/bin";
