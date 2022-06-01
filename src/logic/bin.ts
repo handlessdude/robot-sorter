@@ -34,6 +34,12 @@ export class Bin {
     this.color = color;
     this.strokeColor = strokeColor;
   }
+  public get centerCoordinates() {
+    return {
+      x: this.coordinates.x + this.width / 2,
+      y: this.coordinates.y + this.height / 2,
+    };
+  }
   /*на какие же жертвы приходится идти*/
   static async initialize(
     coordinates: IPoint,
