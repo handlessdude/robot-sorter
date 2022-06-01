@@ -594,12 +594,6 @@ export class Manipulator {
     // moving
     this.rotateBearing(bearingVelocity);
     this.moveDrive(driveVelocity);
-    // if (this.holdedItem) {
-    //   this.holdedItem = {
-    //     ...this.holdedItem,
-    //     coordinates: this.getDriveCoordinates(),
-    //   };
-    // }
 
     // acting
     //TODO:
@@ -623,27 +617,6 @@ export class Manipulator {
     );
     ctx.fill(circle);
     ctx.stroke(circle);
-
-    // if (this.holdedItem) {
-    //   ctx.drawImage(
-    //     this.holdedItem.img,
-    //     0, // sx
-    //     0, // sy
-    //     this.holdedItem.img.width, // sWidth
-    //     this.holdedItem.img.height, // sHeight
-
-    //     this.holdedItem.coordinates.x - this.holdedItem.img.width * 0.5, // dx
-    //     this.holdedItem.coordinates.y - this.holdedItem.img.width * 0.5, // dy
-    //     Math.floor(
-    //       this.holdedItem.img.width *
-    //         drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT
-    //     ), // dWidth
-    //     Math.floor(
-    //       this.holdedItem.img.height *
-    //         drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT
-    //     ) // dHeight
-    //   );
-    // }
 
     //calculate and draw manipulator crane (CRANED)
     ctx.beginPath();
