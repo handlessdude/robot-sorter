@@ -127,7 +127,7 @@ export class Manipulator {
     // BINS MUST BE SPLITTED
     for (const bin of this.bins) {
       if (
-        distance(bin.Centercoordinates, this.getDriveCoordinates()) <=
+        distance(bin.centerCoordinates, this.getDriveCoordinates()) <=
         worldConstants.THROWING_DISTANCE
       ) {
         if (bin.itemType == this.holdedItem.item_type) {
