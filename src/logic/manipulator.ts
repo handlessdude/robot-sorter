@@ -404,13 +404,7 @@ export class Manipulator {
     };
   }
 
-  ST_deliverItem(
-    item: IItem,
-    venue: IPoint,
-    lineVelocity: number,
-    driveVelocity: number,
-    bearingVelocity: number
-  ): void {
+  ST_deliverItem(item: IItem, venue: IPoint): void {
     //
     this.ST_moveToPoint(venue);
     this.taskList.push(
