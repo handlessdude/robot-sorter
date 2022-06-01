@@ -1,3 +1,4 @@
+import type { IItem } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 
@@ -50,4 +51,11 @@ export function toStandartRadianForm(angle: number): number {
   angle = angle % (2 * Math.PI);
   if (angle < 0) angle += 2 * Math.PI;
   return angle;
+}
+
+export function getItemCenter(item: IItem): IPoint {
+  return {
+    x: Math.floor(item.coordinates.x + item.img.width * 0.5),
+    y: Math.floor(item.coordinates.y + item.img.height * 0.5),
+  };
 }

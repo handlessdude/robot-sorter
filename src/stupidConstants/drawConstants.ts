@@ -10,4 +10,12 @@ export const drawConstants = {
     LINE_WIDTH: 3,
     RADIUS: 13,
   },
+  MANIP_COLORS: {
+    FILL_COLOR: "#B065BF",
+    STROKE_COLOR: "#8f509b",
+  },
+  BIN_COLORS: {
+    FILL_COLOR: "#5BDA6E",
+    STROKE_COLOR: "#5AAA66",
+  },
 };

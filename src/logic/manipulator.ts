@@ -7,6 +7,7 @@ import {
   isOnTraffic,
   getMovedPoint,
   toStandartRadianForm,
+  getItemCenter,
 } from "@/utils/utils";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 import { hri } from "human-readable-ids";
@@ -59,8 +60,8 @@ export class Manipulator {
 
     // shiza
     size_radius = 25,
-    color = worldConstants.MANIP_COLORS.FILL_COLOR,
-    strokeColor = worldConstants.MANIP_COLORS.STROKE_COLOR
+    color = drawConstants.MANIP_COLORS.FILL_COLOR,
+    strokeColor = drawConstants.MANIP_COLORS.STROKE_COLOR
   ) {
     this.id = hri.random();
     this.radius = radius; //radius;
@@ -234,7 +235,8 @@ export class Manipulator {
   getItemsInRadius(items: Array<IItem>): Array<IItem> {
     return items.filter(
       (item: IItem) =>
-        distance(item.coordinates, this.coordinates) <= this.radius
+        //distance(item.coordinates, this.coordinates) <= this.radius //было
+        distance(getItemCenter(item), this.coordinates) <= this.radius
     );
   }
 
@@ -363,13 +365,23 @@ export class Manipulator {
 
   // Добавляет в свой массив новые предметы и возвращает true, если появились новые предметы
   updateItemsInBound(worldItems: Array<IItem>): boolean {
+    /*
+    //было
     const newInBoundItems = Array<IItem>();
 
     for (const item of worldItems) {
-      if (distance(item.coordinates, this.coordinates) <= this.radius) {
+      if (
+        //distance(item.coordinates, this.coordinates) <= this.radius
+        distance(getItemCenter(item), this.coordinates) <= this.radius
+      ) {
         newInBoundItems.push(item);
       }
     }
+    //с вашего дозволения поменяю немного код. васхон
+    */
+    const newInBoundItems = worldItems.filter(
+      (item) => distance(getItemCenter(item), this.coordinates) <= this.radius
+    );
 
     let flag = false;
     //newInBoundItems.forEach(
@@ -528,23 +540,6 @@ export class Manipulator {
   draw(ctx: CanvasRenderingContext2D) {
     //draw manipulator base (BASED)
 
-    ctx.fillStyle = "rgba(46, 255, 156, 0.1)";
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = this.strokeColor;
-    ctx.setLineDash([20, 10]);
-
-    const circle2 = new Path2D();
-    circle2.arc(
-      this.coordinates.x,
-      this.coordinates.y,
-      this.radius,
-      0,
-      2 * Math.PI,
-      false
-    );
-    ctx.fill(circle2);
-    ctx.stroke(circle2);
-
     ctx.fillStyle = this.color;
     ctx.lineWidth = 5;
     ctx.strokeStyle = this.strokeColor;
@@ -594,5 +589,24 @@ export class Manipulator {
     );
     ctx.fill(drive);
     ctx.stroke(drive);
+  }
+
+  drawActivityArea(ctx: CanvasRenderingContext2D) {
+    ctx.fillStyle = "rgba(46, 255, 156, 0.1)";
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = this.strokeColor;
+    ctx.setLineDash([20, 10]);
+
+    const circle2 = new Path2D();
+    circle2.arc(
+      this.coordinates.x,
+      this.coordinates.y,
+      this.radius,
+      0,
+      2 * Math.PI,
+      false
+    );
+    ctx.fill(circle2);
+    ctx.stroke(circle2);
   }
 }

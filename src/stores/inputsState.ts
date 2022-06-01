@@ -100,5 +100,8 @@ export const useInputsState = defineStore({
     drawManips(ctx: CanvasRenderingContext2D) {
       this.data.manipulators.forEach((manip) => manip.draw(ctx));
     },
+    drawManipsAreas(ctx: CanvasRenderingContext2D) {
+      this.data.manipulators.forEach((manip) => manip.drawActivityArea(ctx));
+    },
   },
 });
