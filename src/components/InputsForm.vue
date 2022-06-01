@@ -279,8 +279,8 @@ function placeEntity(event: MouseEvent) {
           type="number"
           id="driveMaxVelocity"
           min="0"
-          max="100"
-          step="any"
+          max="1"
+          step="0.1"
           :disabled="inputs.submitted"
           v-model="inputs.data.driveMaxVelocity"
         />
@@ -290,8 +290,8 @@ function placeEntity(event: MouseEvent) {
           type="number"
           id="bearingMaxVelocity"
           min="0"
-          max="100"
-          step="any"
+          max="6.28"
+          step="0.1"
           :disabled="inputs.submitted"
           v-model="inputs.data.bearingMaxVelocity"
         />

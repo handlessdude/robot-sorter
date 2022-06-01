@@ -41,8 +41,8 @@ export function getMovedPoint(
   angle: number
 ): IPoint {
   return {
-    x: radius * Math.cos(angle),
-    y: radius * Math.sin(angle),
+    x: radius * Math.cos(angle) + point.x,
+    y: radius * Math.sin(angle) + point.y,
   };
 }
 

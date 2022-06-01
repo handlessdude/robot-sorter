@@ -174,18 +174,18 @@ export class Manipulator {
     }
     if (Math.abs(b - a) < Math.abs(a + WPI - b)) {
       if (toUp) {
-        if (bearingVelocity > this.bearingTarget - this.currentBearingAngle)
-          this.currentBearingAngle += bearingVelocity;
-        else {
+        if (bearingVelocity > this.bearingTarget - this.currentBearingAngle) {
           this.currentBearingAngle = this.bearingTarget;
           this.bearingTarget = undefined;
+        } else {
+          this.currentBearingAngle += bearingVelocity;
         }
       } else {
-        if (bearingVelocity > this.currentBearingAngle - this.bearingTarget)
-          this.currentBearingAngle -= bearingVelocity;
-        else {
+        if (bearingVelocity > this.currentBearingAngle - this.bearingTarget) {
           this.currentBearingAngle = this.bearingTarget;
           this.bearingTarget = undefined;
+        } else {
+          this.currentBearingAngle -= bearingVelocity;
         }
       }
     }
@@ -214,18 +214,18 @@ export class Manipulator {
     if (this.driveTarget == undefined) return;
 
     if (this.currentDrivePlaceScale < this.driveTarget) {
-      if (this.driveTarget - this.currentDrivePlaceScale < driveVelocity)
-        this.currentDrivePlaceScale += driveVelocity;
-      else {
+      if (this.driveTarget - this.currentDrivePlaceScale < driveVelocity) {
         this.currentDrivePlaceScale = this.driveTarget;
         this.driveTarget = undefined;
+      } else {
+        this.currentDrivePlaceScale += driveVelocity;
       }
     } else {
-      if (this.currentDrivePlaceScale - this.driveTarget < driveVelocity)
-        this.currentDrivePlaceScale -= driveVelocity;
-      else {
+      if (this.currentDrivePlaceScale - this.driveTarget < driveVelocity) {
         this.currentDrivePlaceScale = this.driveTarget;
         this.driveTarget = undefined;
+      } else {
+        this.currentDrivePlaceScale -= driveVelocity;
       }
     }
   }
@@ -268,6 +268,7 @@ export class Manipulator {
 
   // поставить задачу движения до точки
   ST_moveToPoint(coordinates: IPoint): void {
+    console.log(coordinates, this.coordinates);
     this.ST_moveDrive(distance(coordinates, this.coordinates) / this.radius);
 
     let angle = 0;
@@ -286,7 +287,7 @@ export class Manipulator {
       // на одной горизонтали
     } else if (coordinates.y == this.coordinates.y) {
       // и предмет правее манипа
-      if (coordinates.x > this.coordinates.x) angle = 0;
+      if (this.coordinates.x < coordinates.x) angle = 0;
       // или левее
       else if (coordinates.x < this.coordinates.x) angle = Math.PI;
     } else {
@@ -294,7 +295,7 @@ export class Manipulator {
         (coordinates.y - this.coordinates.y) /
           (coordinates.x - this.coordinates.x)
       );
-      console.log("atan:", atanValue);
+      // предмет левее манипа
       if (coordinates.x < this.coordinates.x) {
         angle = Math.PI + atanValue;
       } else {
@@ -408,7 +409,7 @@ export class Manipulator {
       startAngle
     );
 
-    if (lastTime > tc.time) {
+    if (lastTime < tc.time) {
       return { time: -1, coordinates: { x: 0, y: 0 } };
     }
     for (let sy = item.coordinates.y; sy < tc.coordinates.y; sy += step) {
@@ -484,8 +485,6 @@ export class Manipulator {
           ),
           item: e,
         }));
-
-      //console.log(temparr[0]);
 
       if (temparr.length == 0) {
         //SET A TASK
@@ -563,41 +562,31 @@ export class Manipulator {
     ctx.stroke(circle);
 
     //calculate and draw manipulator crane (CRANED)
-    const x0_crane = this.radius;
-    const y0_crane = 0;
-    let x_crane =
-      Math.cos(this._currentBearingAngle) * x0_crane -
-      Math.sin(this._currentBearingAngle) * y0_crane;
-    let y_crane =
-      -Math.sin(this._currentBearingAngle) * x0_crane -
-      Math.cos(this._currentBearingAngle) * y0_crane;
-    x_crane += this.coordinates.x;
-    y_crane += this.coordinates.y;
     ctx.beginPath();
     ctx.moveTo(this.coordinates.x, this.coordinates.y);
-    ctx.lineTo(x_crane, y_crane);
+    let p = getMovedPoint(
+      this.coordinates,
+      this.radius,
+      this.currentBearingAngle
+    );
+    ctx.lineTo(p.x, p.y);
     ctx.lineWidth = drawConstants.CRANE_PARAMS.LINE_WIDTH;
     ctx.strokeStyle = drawConstants.CRANE_PARAMS.STROKE_COLOR;
     ctx.stroke();
 
     //calculate and draw manipulator drive (RAYAN GOSLING)
-    const x0_drive = x0_crane * this._currentDrivePlaceScale;
-    const y0_drive = 0;
-    let x_drive =
-      Math.cos(this._currentBearingAngle) * x0_drive -
-      Math.sin(this._currentBearingAngle) * y0_drive;
-    let y_drive =
-      -Math.sin(this._currentBearingAngle) * x0_drive -
-      Math.cos(this._currentBearingAngle) * y0_drive;
-    x_drive += this.coordinates.x;
-    y_drive += this.coordinates.y;
     ctx.fillStyle = drawConstants.DRIVE_PARAMS.FILL_COLOR;
     ctx.lineWidth = drawConstants.DRIVE_PARAMS.LINE_WIDTH;
     ctx.strokeStyle = drawConstants.DRIVE_PARAMS.STROKE_COLOR;
     const drive = new Path2D();
+    p = getMovedPoint(
+      this.coordinates,
+      this.radius * this._currentDrivePlaceScale,
+      this.currentBearingAngle
+    );
     drive.arc(
-      x_drive,
-      y_drive,
+      p.x,
+      p.y,
       drawConstants.DRIVE_PARAMS.RADIUS,
       0,
       2 * Math.PI,
