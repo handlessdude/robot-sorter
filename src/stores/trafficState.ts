@@ -4,6 +4,7 @@ import type { ItemType, IItem } from "@/types/itemTypes";
 import { genImgPath, getImgItem } from "@/utils/utils";
 import { useLineState } from "./lineState";
 import { drawConstants } from "@/stupidConstants/drawConstants";
+import { hri } from "human-readable-ids";
 export const useTrafficState = defineStore({
   id: "trafficState",
   //сюда пишется текущее состояние
@@ -19,6 +20,7 @@ export const useTrafficState = defineStore({
       if (inputsState.data.items.length === 0) {
         return;
       }
+      const id = hri.random();
       const img = new Image();
       img.src = genImgPath(
         inputsState.data.items[
@@ -31,6 +33,7 @@ export const useTrafficState = defineStore({
       const width = lineState.line.width;
       img.onload = () =>
         this.traffic.push({
+          id,
           img,
           item_type: getImgItem(img.src) as ItemType,
           coordinates: {
@@ -44,9 +47,12 @@ export const useTrafficState = defineStore({
               img.height * drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT
             ),
           },
-          holdedBy: undefined,
+          holdedBy: "", //undefined,
         });
     },
+    // removeSingleItem(itemId: string) {
+    //   this.traffic = this.traffic.filter((item) => !(item.id === itemId));
+    // },
     updateTraffic(
       filterPred: (item: IItem) => boolean,
       updateItem: (item: IItem) => IItem
@@ -62,8 +68,13 @@ export const useTrafficState = defineStore({
           0, // sy
           item.img.width, // sWidth
           item.img.height, // sHeight
-          item.coordinates.x, // dx
-          item.coordinates.y, // dy
+
+          !!item.holdedBy
+            ? item.coordinates.x - item.img.width * 0.5
+            : item.coordinates.x,
+          !!item.holdedBy
+            ? item.coordinates.y - item.img.height * 0.5
+            : item.coordinates.y,
           Math.floor(
             item.img.width * drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT
           ), // dWidth

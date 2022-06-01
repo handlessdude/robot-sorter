@@ -1,6 +1,7 @@
 import type { IItem } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
 import type { Bin } from "@/logic/bin";
+import { useTrafficState } from "@/stores/trafficState";
 import {
   distance,
   isOnTraffic,
@@ -104,14 +105,25 @@ export class Manipulator {
   }
 
   tryTakeItem(item: IItem): void | boolean {
+    console.table({
+      d:
+        distance(getItemCenter(item), this.getDriveCoordinates()) <=
+        worldConstants.GRAB_DISTANCE,
+      thisholdeditem: this.holdedItem === undefined,
+      itemholdedby: item.holdedBy === "",
+    });
     if (
       distance(getItemCenter(item), this.getDriveCoordinates()) <=
         worldConstants.GRAB_DISTANCE &&
-      this.holdedItem == undefined &&
-      item.holdedBy == undefined
+      this.holdedItem === undefined &&
+      item.holdedBy === "" //undefined
     ) {
-      item.holdedBy = this;
-      this.holdedItem = item;
+      const trafficState = useTrafficState();
+      trafficState.traffic = trafficState.traffic.map((item1) =>
+        item1.id === item.id ? { ...item, holdedBy: this.id } : item1
+      );
+      this.holdedItem = { ...item, holdedBy: this.id };
+      //console.log(this.holdedItem);
       return true;
     } else {
       return false;
@@ -124,7 +136,7 @@ export class Manipulator {
       //console.log(1);
     }
 
-    this.holdedItem.holdedBy = undefined;
+    this.holdedItem.holdedBy = ""; //undefined;
     // BINS MUST BE SPLITTED
     for (const bin of this.bins) {
       if (
@@ -138,7 +150,15 @@ export class Manipulator {
           //  this.inBoundItems.findIndex((e) => e == this.holdedItem),
           //  1
           //);
+          if (!(this.holdedItem === undefined)) {
+            const trafficState = useTrafficState();
+            trafficState.traffic = trafficState.traffic.filter(
+              (item1) => !(item1.id === this.holdedItem?.id)
+            );
+          }
+
           this.holdedItem = undefined;
+
           //console.log(2);
           return true;
         }
@@ -146,7 +166,7 @@ export class Manipulator {
     }
 
     if (isOnTraffic(this.getDriveCoordinates())) {
-      this.holdedItem.holdedBy = undefined;
+      this.holdedItem.holdedBy = ""; //undefined;
       this.holdedItem = undefined;
       //console.log(3);
     }
@@ -552,6 +572,13 @@ export class Manipulator {
     // moving
     this.rotateBearing(bearingVelocity);
     this.moveDrive(driveVelocity);
+    // if (this.holdedItem) {
+    //   this.holdedItem = {
+    //     ...this.holdedItem,
+    //     coordinates: this.getDriveCoordinates(),
+    //   };
+    // }
+
     // acting
     //TODO:
   }
@@ -574,6 +601,27 @@ export class Manipulator {
     );
     ctx.fill(circle);
     ctx.stroke(circle);
+
+    // if (this.holdedItem) {
+    //   ctx.drawImage(
+    //     this.holdedItem.img,
+    //     0, // sx
+    //     0, // sy
+    //     this.holdedItem.img.width, // sWidth
+    //     this.holdedItem.img.height, // sHeight
+
+    //     this.holdedItem.coordinates.x - this.holdedItem.img.width * 0.5, // dx
+    //     this.holdedItem.coordinates.y - this.holdedItem.img.width * 0.5, // dy
+    //     Math.floor(
+    //       this.holdedItem.img.width *
+    //         drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT
+    //     ), // dWidth
+    //     Math.floor(
+    //       this.holdedItem.img.height *
+    //         drawConstants.ITEM_SETTINGS.IMG_SCALE_QUOTIENT
+    //     ) // dHeight
+    //   );
+    // }
 
     //calculate and draw manipulator crane (CRANED)
     ctx.beginPath();
