@@ -375,7 +375,7 @@ export class Manipulator {
     const step = 1;
     const tc = this.itemTimeCoordsLeft(item, lineVelocity);
     const lastTime = this.movingToPointTime(
-      { x: item.coordinates.x, y: tc.coords.y },
+      { x: item.coordinates.x, y: tc.coordinates.y },
       driveVelocity,
       bearingVelocity,
       startCoordinates,

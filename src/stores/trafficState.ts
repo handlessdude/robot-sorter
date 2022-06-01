@@ -5,7 +5,7 @@ import { worldConstants } from "@/stupidConstants/worldConstants";
 import { genImgPath, getImgItem } from "@/utils/utils";
 import { useLineState } from "./lineState";
 export const useTrafficState = defineStore({
-  id: "worldState",
+  id: "trafficState",
   //сюда пишется текущее состояние
   state: () => ({
     //traffic: <IItem[]>[], //equivalents
@@ -25,7 +25,7 @@ export const useTrafficState = defineStore({
           Math.floor(Math.random() * inputsState.data.items.length)
         ]
       );
-      console.log(`Generating new image: ${getImgItem(img.src)}`);
+      console.log(`Generating new item: ${getImgItem(img.src)}`);
       const lineState = useLineState();
       const x_left = lineState.line.left;
       const width = lineState.line.width;

@@ -2,6 +2,8 @@
 import { useInputsState } from "@/stores/inputsState";
 import { useLineState } from "@/stores/lineState";
 import { useTrafficState } from "@/stores/trafficState";
+import { useWorldState } from "@/stores/worldState";
+
 import { drawConstants } from "@/stupidConstants/drawConstants";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 import { distance } from "@/utils/utils";
@@ -9,6 +11,7 @@ import { ref, watch, type Ref } from "vue";
 const inputs = useInputsState();
 const lineState = useLineState();
 const trafficState = useTrafficState();
+const worldState = useWorldState();
 let worldCanvas: HTMLCanvasElement;
 
 enum InputMode {
@@ -16,31 +19,32 @@ enum InputMode {
   BINS = "bins",
   NONE = "none",
 }
-
 watch(
-  () => inputs.data.bins.length,
+  () => inputs.data.items.length,
   () => {
+    //console.log(inputs.data.bins);
+    // inputs.data.bins.forEach((bin) =>
+    //   console.log(bin.itemType, inputs.data.items.includes(bin.itemType))
+    // );
+    inputs.data.bins = inputs.data.bins.filter((bin) => {
+      //console.log(bin.itemType, inputs.data.items.includes(bin.itemType));
+      return inputs.data.items.includes(bin.itemType);
+    });
+  }
+);
+watch(
+  () => [inputs.data.bins.length, inputs.data.manipulators.length],
+  () => {
+    if (!worldCanvas) {
+      return;
+    }
     const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, worldCanvas.width, worldCanvas.height);
-    lineState.line.draw(ctx);
-    trafficState.drawTraffic(ctx);
-    inputs.drawBins(ctx);
-    inputs.drawManips(ctx);
+    worldState.drawWorld(ctx);
 
     // if (inputs.binsCount === inputs.data.items.length) {
     //   inputMode.value = InputMode.NONE;
     // }
-  }
-);
-watch(
-  () => inputs.data.manipulators.length,
-  () => {
-    const ctx = worldCanvas.getContext("2d") as CanvasRenderingContext2D;
-    ctx.clearRect(0, 0, worldCanvas.width, worldCanvas.height);
-    lineState.line.draw(ctx);
-    trafficState.drawTraffic(ctx);
-    inputs.drawBins(ctx);
-    inputs.drawManips(ctx);
   }
 );
 const inputMode: Ref<InputMode> = ref(InputMode.NONE);
@@ -290,16 +294,6 @@ function placeEntity(event: MouseEvent) {
           v-model="inputs.data.bearingMaxVelocity"
         />
         <label for="bearingMaxVelocity">Bearing max velocity</label>
-
-        <input
-          type="number"
-          id="manipulatorCount"
-          min="1"
-          step="1"
-          :disabled="inputs.submitted"
-          v-model="inputs.data.manipulatorCount"
-        />
-        <label for="manipulatorCount">Manipulator count</label>
       </div>
 
       <h4>Please select items to put on the line:</h4>
@@ -460,7 +454,7 @@ function placeEntity(event: MouseEvent) {
 .num-inputs {
   width: 100%;
   display: grid;
-  grid-template: 40px 40px 40px 40px 40px / 100px 1fr;
+  grid-template: 40px 40px 40px 40px / 100px 1fr;
   grid-gap: 1rem;
   label {
     margin-left: 1rem;
