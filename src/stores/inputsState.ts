@@ -1,6 +1,6 @@
 import { Manipulator } from "@/logic/manipulator";
 
-import type { ItemType } from "@/types/itemTypes";
+import type { IItem, ItemType } from "@/types/itemTypes";
 import { isNotEmpty, isPositive } from "@/utils/utils";
 import { defineStore } from "pinia";
 import { Bin } from "@/logic/bin";
@@ -9,12 +9,10 @@ export const useInputsState = defineStore({
   id: "inputs",
   state: () => ({
     data: {
-      lineVelocity: 0,
-      activityR: 0,
-
-      bearingMaxVelocity: 0,
-      driveMaxVelocity: 0,
-      manipulatorCount: 0,
+      lineVelocity: 2,
+      activityR: 600,
+      bearingMaxVelocity: 0.5,
+      driveMaxVelocity: 0.3,
       items: <string[]>[],
       bins: <Bin[]>[],
       manipulators: <Manipulator[]>[],
@@ -56,12 +54,13 @@ export const useInputsState = defineStore({
         (m) => m.id != manip_id
       );
     },
-    pushNewBin(x: number, y: number) {
+    async pushNewBin(x: number, y: number) {
       const nextType = this.nextTypeToPlaceBin;
       if (!nextType) {
         return;
       }
-      this.data.bins.push(new Bin({ x, y }, nextType as ItemType, 0));
+      const newBin = await Bin.initialize({ x, y }, nextType as ItemType, 0);
+      this.data.bins.push(newBin);
     },
     removeBin(bin_id: string) {
       this.data.bins = this.data.bins.filter((bin) => bin.id != bin_id);
@@ -71,6 +70,9 @@ export const useInputsState = defineStore({
       if (this.isValid) {
         this.submitted = true;
         this.error = "";
+        this.data.manipulators.forEach((manip) =>
+          manip.findBins(this.data.bins)
+        );
       } else {
         this.error = "Incorrect data input. Please check your inputs.";
       }
@@ -84,8 +86,22 @@ export const useInputsState = defineStore({
       this.data.bins.forEach((bin) => bin.draw(ctx));
     },
 
+    updateManips(traffic: Array<IItem>) {
+      this.data.manipulators.forEach((manip) =>
+        manip.update(
+          traffic,
+          this.data.lineVelocity,
+          this.data.driveMaxVelocity,
+          this.data.bearingMaxVelocity
+        )
+      );
+    },
+
     drawManips(ctx: CanvasRenderingContext2D) {
       this.data.manipulators.forEach((manip) => manip.draw(ctx));
+    },
+    drawManipsAreas(ctx: CanvasRenderingContext2D) {
+      this.data.manipulators.forEach((manip) => manip.drawActivityArea(ctx));
     },
   },
 });
