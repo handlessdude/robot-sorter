@@ -1,6 +1,7 @@
 import type { IItem } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
 import { worldConstants } from "@/stupidConstants/worldConstants";
+import { drawConstants } from "@/stupidConstants/drawConstants";
 
 export function lerp(A: number, B: number, t: number) {
   return A + (B - A) * t;
@@ -31,8 +32,9 @@ export function isPositive(num: number) {
 
 export function isOnTraffic(coordinates: IPoint): boolean {
   return (
-    coordinates.x >= worldConstants.ITEM_WIDTH &&
-    coordinates.x <= worldConstants.LINE_WIDTH - worldConstants.ITEM_WIDTH
+    coordinates.x >= drawConstants.ITEM_SETTINGS.ITEM_WIDTH &&
+    coordinates.x <=
+      drawConstants.LINE_WIDTH - drawConstants.ITEM_SETTINGS.ITEM_WIDTH
   );
 }
 
