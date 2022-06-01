@@ -526,9 +526,28 @@ export class Manipulator {
 
   draw(ctx: CanvasRenderingContext2D) {
     //draw manipulator base (BASED)
+
+    ctx.fillStyle = "rgba(46, 255, 156, 0.1)";
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = this.strokeColor;
+    ctx.setLineDash([20, 10]);
+
+    const circle2 = new Path2D();
+    circle2.arc(
+      this.coordinates.x,
+      this.coordinates.y,
+      this.radius,
+      0,
+      2 * Math.PI,
+      false
+    );
+    ctx.fill(circle2);
+    ctx.stroke(circle2);
+
     ctx.fillStyle = this.color;
     ctx.lineWidth = 5;
     ctx.strokeStyle = this.strokeColor;
+    ctx.setLineDash([]);
     const circle = new Path2D();
     circle.arc(
       this.coordinates.x,
