@@ -76,7 +76,7 @@ function animate() {
   //console.log("current worldState.traffic.length", worldState.traffic.length);
 
   inputsState.updateManips(trafficState.traffic);
-  console.log(inputsState.data.manipulators);
+  //console.log(inputsState.data.manipulators);
 
   //lol do not touch these LINES
   worldCanvas.height = window.innerHeight - worldConstants.HEADER_OFFSET;
