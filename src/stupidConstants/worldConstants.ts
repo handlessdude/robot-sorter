@@ -7,12 +7,9 @@ export const worldConstants = {
   BIN_IMG_SCALE: 0.43,
   ITEM_VELOCITY: 2,
   GRAB_DISTANCE: 1,
-<<<<<<< HEAD
   THROWING_DISTANCE: 1,
   ITEM_WIDTH: 20,
-=======
   MANIP_RADIUS: 25,
->>>>>>> ui_upd
   MANIP_COLORS: {
     FILL_COLOR: "#B065BF",
     STROKE_COLOR: "#8f509b",
