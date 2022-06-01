@@ -204,10 +204,9 @@ export class Manipulator {
     driveVelocity: number,
     startPlaceScale = this.currentDrivePlaceScale
   ): number {
+    console.log(placeScale);
     if (placeScale < 0 || placeScale > 1) return -1;
-    return (
-      (this.radius * Math.abs(startPlaceScale - placeScale)) / driveVelocity
-    );
+    return Math.abs(startPlaceScale - placeScale) / driveVelocity;
   }
 
   // передвинуть привод
@@ -235,8 +234,8 @@ export class Manipulator {
   getItemsInRadius(items: Array<IItem>): Array<IItem> {
     return items.filter(
       (item: IItem) =>
-        //distance(item.coordinates, this.coordinates) <= this.radius //было
-        distance(getItemCenter(item), this.coordinates) <= this.radius
+        distance(item.coordinates, this.coordinates) <= this.radius //было
+      //distance(getItemCenter(item), this.coordinates) <= this.radius
     );
   }
 
@@ -270,7 +269,11 @@ export class Manipulator {
 
   // поставить задачу движения до точки
   ST_moveToPoint(coordinates: IPoint): void {
-    console.log(coordinates, this.coordinates);
+    console.log(
+      coordinates,
+      this.coordinates,
+      distance(coordinates, this.coordinates)
+    );
     this.ST_moveDrive(distance(coordinates, this.coordinates) / this.radius);
 
     let angle = 0;
@@ -360,6 +363,7 @@ export class Manipulator {
       startAngle
     );
 
+    console.log(driveTime, bearingTime);
     return Math.max(driveTime, bearingTime);
   }
 
@@ -379,8 +383,9 @@ export class Manipulator {
     }
     //с вашего дозволения поменяю немного код. васхон
     */
+    //getItemCenter(item)
     const newInBoundItems = worldItems.filter(
-      (item) => distance(getItemCenter(item), this.coordinates) <= this.radius
+      (item) => distance(item.coordinates, this.coordinates) <= this.radius
     );
 
     let flag = false;
@@ -412,8 +417,9 @@ export class Manipulator {
     const step = 1;
     const tc = this.itemTimeCoordsLeft(item, lineVelocity);
 
+    /*
     const lastTime = this.movingToPointTime(
-      { x: item.coordinates.x, y: tc.coordinates.y },
+      { x: tc.coordinates.x, y: tc.coordinates.y },
       driveVelocity,
       bearingVelocity,
       startCoordinates,
@@ -421,9 +427,11 @@ export class Manipulator {
       startAngle
     );
 
+    console.log(lastTime, tc.time);
     if (lastTime < tc.time) {
       return { time: -1, coordinates: { x: 0, y: 0 } };
     }
+    */
     for (let sy = item.coordinates.y; sy < tc.coordinates.y; sy += step) {
       const time = this.movingToPointTime(
         { x: item.coordinates.x, y: sy },
@@ -441,7 +449,7 @@ export class Manipulator {
       }
     }
     return {
-      time: lastTime,
+      time: -1,
       coordinates: { x: tc.coordinates.x, y: tc.coordinates.y },
     };
   }
@@ -496,7 +504,8 @@ export class Manipulator {
             bearingVelocity
           ),
           item: e,
-        }));
+        }))
+        .filter((e) => e.time >= 0);
 
       if (temparr.length == 0) {
         //SET A TASK
