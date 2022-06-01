@@ -9,6 +9,7 @@ import {
 } from "@/utils/utils";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 import { hri } from "human-readable-ids";
+import { drawConstants } from "@/stupidConstants/drawConstants";
 
 const WPI = 2 * Math.PI;
 
@@ -50,7 +51,7 @@ export class Manipulator {
     strokeColor = worldConstants.MANIP_COLORS.STROKE_COLOR
   ) {
     this.id = hri.random();
-    this.radius = radius;
+    this.radius = 350; //radius;
     this.coordinates = coordinates;
     this.bins = <Bin[]>[];
     this.inBoundItems = <IItem[]>[];
@@ -371,10 +372,10 @@ export class Manipulator {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    //draw manipulator base (BASED)
     ctx.fillStyle = this.color;
     ctx.lineWidth = 5;
     ctx.strokeStyle = this.strokeColor;
-
     const circle = new Path2D();
     circle.arc(
       this.coordinates.x,
@@ -384,8 +385,51 @@ export class Manipulator {
       2 * Math.PI,
       false
     );
-
     ctx.fill(circle);
     ctx.stroke(circle);
+
+    //calculate and draw manipulator crane (CRANED)
+    const x0_crane = this.radius;
+    const y0_crane = 0;
+    let x_crane =
+      Math.cos(this._currentBearingAngle) * x0_crane -
+      Math.sin(this._currentBearingAngle) * y0_crane;
+    let y_crane =
+      -Math.sin(this._currentBearingAngle) * x0_crane -
+      Math.cos(this._currentBearingAngle) * y0_crane;
+    x_crane += this.coordinates.x;
+    y_crane += this.coordinates.y;
+    ctx.beginPath();
+    ctx.moveTo(this.coordinates.x, this.coordinates.y);
+    ctx.lineTo(x_crane, y_crane);
+    ctx.lineWidth = drawConstants.CRANE_PARAMS.LINE_WIDTH;
+    ctx.strokeStyle = drawConstants.CRANE_PARAMS.STROKE_COLOR;
+    ctx.stroke();
+
+    //calculate and draw manipulator drive (RAYAN GOSLING)
+    const x0_drive = x0_crane * this._currentDrivePlaceScale;
+    const y0_drive = 0;
+    let x_drive =
+      Math.cos(this._currentBearingAngle) * x0_drive -
+      Math.sin(this._currentBearingAngle) * y0_drive;
+    let y_drive =
+      -Math.sin(this._currentBearingAngle) * x0_drive -
+      Math.cos(this._currentBearingAngle) * y0_drive;
+    x_drive += this.coordinates.x;
+    y_drive += this.coordinates.y;
+    ctx.fillStyle = drawConstants.DRIVE_PARAMS.FILL_COLOR;
+    ctx.lineWidth = drawConstants.DRIVE_PARAMS.LINE_WIDTH;
+    ctx.strokeStyle = drawConstants.DRIVE_PARAMS.STROKE_COLOR;
+    const drive = new Path2D();
+    drive.arc(
+      x_drive,
+      y_drive,
+      drawConstants.DRIVE_PARAMS.RADIUS,
+      0,
+      2 * Math.PI,
+      false
+    );
+    ctx.fill(drive);
+    ctx.stroke(drive);
   }
 }
