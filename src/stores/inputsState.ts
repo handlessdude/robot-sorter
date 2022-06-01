@@ -1,6 +1,6 @@
 import { Manipulator } from "@/logic/manipulator";
 
-import type { ItemType } from "@/types/itemTypes";
+import type { IItem, ItemType } from "@/types/itemTypes";
 import { isNotEmpty, isPositive } from "@/utils/utils";
 import { defineStore } from "pinia";
 import { Bin } from "@/logic/bin";
@@ -71,6 +71,9 @@ export const useInputsState = defineStore({
       if (this.isValid) {
         this.submitted = true;
         this.error = "";
+        this.data.manipulators.forEach((manip) =>
+          manip.findBins(this.data.bins)
+        );
       } else {
         this.error = "Incorrect data input. Please check your inputs.";
       }
@@ -82,6 +85,17 @@ export const useInputsState = defineStore({
 
     drawBins(ctx: CanvasRenderingContext2D) {
       this.data.bins.forEach((bin) => bin.draw(ctx));
+    },
+
+    updateManips(traffic: Array<IItem>) {
+      this.data.manipulators.forEach((manip) =>
+        manip.update(
+          traffic,
+          this.data.lineVelocity,
+          this.data.driveMaxVelocity,
+          this.data.bearingMaxVelocity
+        )
+      );
     },
 
     drawManips(ctx: CanvasRenderingContext2D) {

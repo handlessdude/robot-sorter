@@ -79,10 +79,13 @@ function animate() {
   );
   //console.log("current worldState.traffic.length", worldState.traffic.length);
 
+  inputsState.updateManips(trafficState.traffic);
+  console.log(inputsState.data.manipulators);
+
   /*here we detect the items on canvas*/
   model.detect(worldCanvas).then(function (predictions) {
     if (predictions.length > 0) {
-      console.log(predictions);
+      //console.log(predictions);
     }
   });
   //lol do not touch these LINES
