@@ -105,13 +105,6 @@ export class Manipulator {
   }
 
   tryTakeItem(item: IItem): void | boolean {
-    console.table({
-      d:
-        distance(getItemCenter(item), this.getDriveCoordinates()) <=
-        worldConstants.GRAB_DISTANCE,
-      thisholdeditem: this.holdedItem === undefined,
-      itemholdedby: item.holdedBy === "",
-    });
     if (
       distance(getItemCenter(item), this.getDriveCoordinates()) <=
         worldConstants.GRAB_DISTANCE &&
@@ -557,16 +550,21 @@ export class Manipulator {
 
       if (temparr.length == 0) {
         //SET A TASK
-        this.ST_moveDrive(0.6);
-        this.ST_rotateBearing(this.coordinates.x > 500 ? Math.PI + 0.3 : -0.3);
+        if (this.holdedItem == undefined) {
+          this.ST_moveDrive(0.6);
+          this.ST_rotateBearing(
+            this.coordinates.x > 500 ? Math.PI + 0.3 : -0.3
+          );
+        }
       } else {
         const choosedItem = temparr.reduce((_prev, _curr) => {
           if (_curr.time < _prev.time) return _curr;
           else return _prev;
         }, temparr[0]);
 
-        if (this.holdedItem == undefined)
+        if (this.holdedItem == undefined) {
           this.ST_deliverItem(choosedItem.item, choosedItem.coordinates);
+        }
       }
     } else {
       // update states due to the task list
