@@ -76,7 +76,7 @@ function animate() {
           (manip) => manip.id === item.holdedBy
         );
       }
-      if (manip !== undefined) {
+      if (!(manip === undefined)) {
         return {
           ...item,
           coordinates: manip.getDriveCoordinates(),
@@ -84,6 +84,7 @@ function animate() {
       } else {
         return {
           ...item,
+          holdedBy: "",
           coordinates: {
             x: item.coordinates.x,
             y: item.coordinates.y + inputsState.data.lineVelocity,
