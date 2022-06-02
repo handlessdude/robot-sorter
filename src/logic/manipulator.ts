@@ -557,8 +557,12 @@ export class Manipulator {
 
       if (temparr.length == 0) {
         //SET A TASK
-        this.ST_moveDrive(0.6);
-        this.ST_rotateBearing(this.coordinates.x > 500 ? Math.PI + 0.3 : -0.3);
+        if (this.holdedItem == undefined) {
+          this.ST_moveDrive(0.6);
+          this.ST_rotateBearing(
+            this.coordinates.x > 500 ? Math.PI + 0.3 : -0.3
+          );
+        }
       } else {
         const choosedItem = temparr.reduce((_prev, _curr) => {
           if (_curr.time < _prev.time) return _curr;
