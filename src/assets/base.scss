@@ -1,13 +1,13 @@
 :root {
   --active-link: #61dafb;
   --magenta: #f09;
-  --red:#ff002f;
+  --red: #ff002f;
   --white: #ffffff;
-  --gray: #edeef0;
+  --gray: #e2e2e2;
   --light-gray: #6b6b6b;
   --middle-gray: #4d4d4d;
   --dark-gray: #282828;
-  --darkest-gray:  #121212;
+  --darkest-gray: #121212;
   --lazure: #0fa;
   --emerald: #276749;
   --light-emerald: #2f855a;
@@ -34,7 +34,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100vh;
   margin: 0;
 }
@@ -43,8 +44,9 @@ html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   color: var(--color-text);
   background: var(--gray);
   transition: color 0.5s, background-color 0.5s;
@@ -61,19 +63,19 @@ body {
 
 main {
   /* padding: 0 1rem 0 1rem; */
-   display: flex;
+  display: flex;
   justify-content: center;
   align-items: center;
   position: fixed;
   top: var(--header-height);
-  right:0;
-  left:0;
+  right: 0;
+  left: 0;
   bottom: 0;
 }
 
 input,
 select,
-textarea{
+textarea {
   font-family: Inter, Roboto, Oxygen, Fira Sans, Helvetica Neue, sans-serif;
   outline: none;
   border: 2px solid #ccc;
@@ -81,10 +83,9 @@ textarea{
   border-radius: 3px;
   font-size: 1rem;
   resize: none;
- 
 }
-input[type=number]{
-   width: 100px;
+input[type="number"] {
+  width: 100px;
 }
 input:active:not(:disabled),
 input:focus,
@@ -92,7 +93,7 @@ textarea:active,
 textarea:focus {
   transition: border 0.22s;
 }
-textarea:disabled{
+textarea:disabled {
   background-color: white;
 }
 .card {
@@ -101,9 +102,9 @@ textarea:disabled{
   padding: 1.5rem;
 }
 small {
-color: crimson;
+  color: crimson;
 }
-textarea#query{
+textarea#query {
   height: 4rem;
   margin-bottom: 1rem;
 }
@@ -126,7 +127,7 @@ textarea#query{
   background: var(--header-color);
   transition: all 0.22s;
 }
-.btn.stop{
+.btn.stop {
   background: crimson;
   border-color: pink;
 }
@@ -145,10 +146,10 @@ textarea#query{
 
 .btn:disabled {
   cursor: not-allowed;
-  opacity: 1!important;
-  background: #eee!important;
-  border-color: #ddd!important;
-  color: #999!important;
+  opacity: 1 !important;
+  background: #eee !important;
+  border-color: #ddd !important;
+  color: #999 !important;
 }
 
 .btn:active {

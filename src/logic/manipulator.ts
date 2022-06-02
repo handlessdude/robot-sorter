@@ -1,6 +1,7 @@
 import type { IItem } from "@/types/itemTypes";
 import type { IPoint } from "@/types/point";
 import type { Bin } from "@/logic/bin";
+import { useTrafficState } from "@/stores/trafficState";
 import {
   distance,
   isOnTraffic,
@@ -97,21 +98,32 @@ export class Manipulator {
     this.bins = <Bin[]>[];
     // bins: inputState.$state.data.bins
     for (const bin of bins) {
-      if (distance(bin.coordinates, this.coordinates) <= this.radius) {
+      if (distance(bin.centerCoordinates, this.coordinates) <= this.radius) {
         this.bins.push(bin);
       }
     }
   }
 
   tryTakeItem(item: IItem): void | boolean {
+    console.table({
+      d:
+        distance(getItemCenter(item), this.getDriveCoordinates()) <=
+        worldConstants.GRAB_DISTANCE,
+      thisholdeditem: this.holdedItem === undefined,
+      itemholdedby: item.holdedBy === "",
+    });
     if (
-      distance(item.coordinates, this.coordinates) <=
+      distance(getItemCenter(item), this.getDriveCoordinates()) <=
         worldConstants.GRAB_DISTANCE &&
-      this.holdedItem == undefined &&
-      item.holdedBy == undefined
+      this.holdedItem === undefined &&
+      item.holdedBy === "" //undefined
     ) {
-      this.holdedItem = item;
-      item.holdedBy = this;
+      const trafficState = useTrafficState();
+      trafficState.traffic = trafficState.traffic.map((item1) =>
+        item1.id === item.id ? { ...item, holdedBy: this.id } : item1
+      );
+      this.holdedItem = { ...item, holdedBy: this.id };
+      //console.log(this.holdedItem);
       return true;
     } else {
       return false;
@@ -119,29 +131,59 @@ export class Manipulator {
   }
 
   tryThrowItem(): void | boolean {
-    if (this.holdedItem == undefined) return false;
+    if (this.holdedItem == undefined) {
+      return false;
+      //console.log(1);
+    }
 
-    this.holdedItem.holdedBy = undefined;
+    this.holdedItem.holdedBy = ""; //undefined;
     // BINS MUST BE SPLITTED
     for (const bin of this.bins) {
       if (
-        distance(bin.coordinates, this.holdedItem.coordinates) <=
+        distance(bin.centerCoordinates, this.getDriveCoordinates()) <=
         worldConstants.THROWING_DISTANCE
       ) {
         if (bin.itemType == this.holdedItem.item_type) {
           bin.itemsPlaced++;
           // TODO ! delete this.holdedItem
+          //this.inBoundItems.splice(
+          //  this.inBoundItems.findIndex((e) => e == this.holdedItem),
+          //  1
+          //);
+          if (!(this.holdedItem === undefined)) {
+            const trafficState = useTrafficState();
+            trafficState.traffic = trafficState.traffic.filter(
+              (item1) => !(item1.id === this.holdedItem?.id)
+            );
+          }
+
           this.holdedItem = undefined;
+
+          //console.log(2);
+          return true;
+        } else {
+          if (!(this.holdedItem === undefined)) {
+            const trafficState = useTrafficState();
+            trafficState.traffic = trafficState.traffic.filter(
+              (item1) => !(item1.id === this.holdedItem?.id)
+            );
+          }
+
+          this.holdedItem = undefined;
+
+          //console.log(2);
           return true;
         }
       }
     }
 
     if (isOnTraffic(this.getDriveCoordinates())) {
-      this.holdedItem.holdedBy = undefined;
+      this.holdedItem.holdedBy = ""; //undefined;
       this.holdedItem = undefined;
+      //console.log(3);
     }
 
+    //console.log(4);
     return false;
   }
 
@@ -188,6 +230,28 @@ export class Manipulator {
           this.currentBearingAngle -= bearingVelocity;
         }
       }
+    } else {
+      if (toUp) {
+        if (
+          bearingVelocity >
+          -this.bearingTarget + this.currentBearingAngle + WPI
+        ) {
+          this.currentBearingAngle = this.bearingTarget;
+          this.bearingTarget = undefined;
+        } else {
+          this.currentBearingAngle -= bearingVelocity;
+        }
+      } else {
+        if (
+          bearingVelocity >
+          this.bearingTarget - this.currentBearingAngle + WPI
+        ) {
+          this.currentBearingAngle = this.bearingTarget;
+          this.bearingTarget = undefined;
+        } else {
+          this.currentBearingAngle += bearingVelocity;
+        }
+      }
     }
   }
 
@@ -203,7 +267,6 @@ export class Manipulator {
     driveVelocity: number,
     startPlaceScale = this.currentDrivePlaceScale
   ): number {
-    console.log(placeScale);
     if (placeScale < 0 || placeScale > 1) return -1;
     return Math.abs(startPlaceScale - placeScale) / driveVelocity;
   }
@@ -233,7 +296,7 @@ export class Manipulator {
   getItemsInRadius(items: Array<IItem>): Array<IItem> {
     return items.filter(
       (item: IItem) =>
-        distance(item.coordinates, this.coordinates) <= this.radius //было
+        distance(getItemCenter(item), this.coordinates) <= this.radius //было
       //distance(getItemCenter(item), this.coordinates) <= this.radius
     );
   }
@@ -245,15 +308,16 @@ export class Manipulator {
   ): { time: number; coordinates: IPoint } {
     //сначала получим координаты пересечения окружности манипа и движения предмета
     // item должен быть в радиусе
+    const coordinates = getItemCenter(item);
     const y =
       Math.max(
         Math.sqrt(
           Math.pow(this.radius, 2) -
-            Math.pow(item.coordinates.x - this.coordinates.x, 2)
+            Math.pow(coordinates.x - this.coordinates.x, 2)
         ),
         -Math.sqrt(
           Math.pow(this.radius, 2) -
-            Math.pow(item.coordinates.x - this.coordinates.x, 2)
+            Math.pow(coordinates.x - this.coordinates.x, 2)
         )
       ) + this.coordinates.y;
     //непонятно как корень работает
@@ -261,18 +325,13 @@ export class Manipulator {
 
     //Теперь высчитываем время
     return {
-      time: (y - item.coordinates.y) / lineVelocity,
-      coordinates: { x: item.coordinates.x, y: y },
+      time: (y - coordinates.y) / lineVelocity,
+      coordinates: { x: coordinates.x, y: y },
     };
   }
 
   // поставить задачу движения до точки
   ST_moveToPoint(coordinates: IPoint): void {
-    console.log(
-      coordinates,
-      this.coordinates,
-      distance(coordinates, this.coordinates)
-    );
     this.ST_moveDrive(distance(coordinates, this.coordinates) / this.radius);
 
     let angle = 0;
@@ -362,7 +421,6 @@ export class Manipulator {
       startAngle
     );
 
-    console.log(driveTime, bearingTime);
     return Math.max(driveTime, bearingTime);
   }
 
@@ -384,7 +442,7 @@ export class Manipulator {
     */
     //getItemCenter(item)
     const newInBoundItems = worldItems.filter(
-      (item) => distance(item.coordinates, this.coordinates) <= this.radius
+      (item) => distance(getItemCenter(item), this.coordinates) <= this.radius
     );
 
     let flag = false;
@@ -415,6 +473,7 @@ export class Manipulator {
   ): { time: number; coordinates: IPoint } {
     const step = 1;
     const tc = this.itemTimeCoordsLeft(item, lineVelocity);
+    const coordinates = getItemCenter(item);
 
     /*
     const lastTime = this.movingToPointTime(
@@ -431,9 +490,9 @@ export class Manipulator {
       return { time: -1, coordinates: { x: 0, y: 0 } };
     }
     */
-    for (let sy = item.coordinates.y; sy < tc.coordinates.y; sy += step) {
+    for (let sy = coordinates.y; sy < tc.coordinates.y; sy += step) {
       const time = this.movingToPointTime(
-        { x: item.coordinates.x, y: sy },
+        { x: coordinates.x, y: sy },
         driveVelocity,
         bearingVelocity,
         startCoordinates,
@@ -441,10 +500,10 @@ export class Manipulator {
         startAngle
       );
 
-      const itemTime = (sy - item.coordinates.y) / lineVelocity;
+      const itemTime = (sy - coordinates.y) / lineVelocity;
 
       if (time <= itemTime) {
-        return { time: time, coordinates: { x: item.coordinates.x, y: sy } };
+        return { time: time, coordinates: { x: coordinates.x, y: sy } };
       }
     }
     return {
@@ -455,11 +514,12 @@ export class Manipulator {
 
   ST_deliverItem(item: IItem, venue: IPoint): void {
     //
-    this.ST_moveToPoint(venue);
-    /*
     this.taskList.push(
+      () => this.ST_moveToPoint(venue),
       () => {
-        if (!this.driveTarget && !this.bearingTarget) this.isActiveTask = false;
+        if (this.driveTarget == undefined && this.bearingTarget == undefined) {
+          this.isActiveTask = false;
+        }
       },
       () => this.tryTakeItem(item),
       () => {
@@ -470,18 +530,19 @@ export class Manipulator {
       },
       () =>
         this.ST_moveToPoint(
-          this.bins.find((e) => e.itemType == item.item_type)!.coordinates
+          this.bins.find((e) => e.itemType == item.item_type)!.centerCoordinates
         ),
       () => {
-        if (!this.driveTarget && !this.bearingTarget) this.isActiveTask = false;
+        if (this.driveTarget == undefined && this.bearingTarget == undefined)
+          this.isActiveTask = false;
       },
       () => {
         if (!this.tryThrowItem()) {
           //an impossible way
+          console.log("impossible");
         }
       }
     );
-    */
   }
 
   think(
@@ -504,25 +565,36 @@ export class Manipulator {
           ),
           item: e,
         }))
-        .filter((e) => e.time >= 0);
+        .filter(
+          (e) =>
+            e.time >= 0 && (e.item.holdedBy == "" || e.item.holdedBy == this.id)
+        );
 
       if (temparr.length == 0) {
         //SET A TASK
+        if (this.holdedItem == undefined) {
+          this.ST_moveDrive(0.6);
+          this.ST_rotateBearing(
+            this.coordinates.x > 500 ? Math.PI + 0.3 : -0.3
+          );
+        }
       } else {
         const choosedItem = temparr.reduce((_prev, _curr) => {
           if (_curr.time < _prev.time) return _curr;
           else return _prev;
         }, temparr[0]);
 
-        console.log(choosedItem);
-
-        this.ST_deliverItem(choosedItem.item, choosedItem.coordinates);
+        if (this.holdedItem == undefined)
+          this.ST_deliverItem(choosedItem.item, choosedItem.coordinates);
       }
     } else {
       // update states due to the task list
       if (this.taskList.length > 0) {
-        if (!this.isActiveTask) this.taskList.shift()!();
-        else this.taskList[0]();
+        do {
+          const preIsActive = this.isActiveTask;
+          this.taskList[0]();
+          if (!preIsActive) this.taskList.shift();
+        } while (this.taskList.length > 0 && !this.isActiveTask);
       }
     }
   }
@@ -541,6 +613,7 @@ export class Manipulator {
     // moving
     this.rotateBearing(bearingVelocity);
     this.moveDrive(driveVelocity);
+
     // acting
     //TODO:
   }

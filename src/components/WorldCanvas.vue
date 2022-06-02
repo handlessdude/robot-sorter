@@ -60,13 +60,38 @@ function animate() {
     (item) =>
       item.coordinates.y <
       window.innerHeight - drawConstants.CANVAS_SETTINGS.HEADER_OFFSET,
-    (item) => ({
-      ...item,
-      coordinates: {
-        x: item.coordinates.x,
-        y: item.coordinates.y + inputsState.data.lineVelocity,
-      },
-    })
+    // (item) => ({
+    //   ...item,
+    //   coordinates: {
+    //     x: item.coordinates.x,
+    //     y: item.coordinates.y + inputsState.data.lineVelocity,
+    //   },
+    // })
+    (item) => {
+      console.log("item ", item);
+      console.log("item.holdedBy ", item.holdedBy);
+      let manip;
+      if (!(item.holdedBy === "")) {
+        manip = inputsState.data.manipulators.find(
+          (manip) => manip.id === item.holdedBy
+        );
+      }
+      if (!(manip === undefined)) {
+        return {
+          ...item,
+          coordinates: manip.getDriveCoordinates(),
+        };
+      } else {
+        return {
+          ...item,
+          holdedBy: "",
+          coordinates: {
+            x: item.coordinates.x,
+            y: item.coordinates.y + inputsState.data.lineVelocity,
+          },
+        };
+      }
+    }
   );
 
   inputsState.updateManips(trafficState.traffic);

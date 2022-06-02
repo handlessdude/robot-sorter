@@ -268,7 +268,7 @@ function placeEntity(event: MouseEvent) {
         <input
           type="number"
           id="lineVelocity"
-          min="0"
+          min="0.5"
           step="any"
           :disabled="inputs.submitted"
           v-model="inputs.data.lineVelocity"
@@ -278,7 +278,7 @@ function placeEntity(event: MouseEvent) {
         <input
           type="number"
           id="activityR"
-          min="0"
+          min="0.001"
           step="any"
           :disabled="inputs.submitted"
           v-model="inputs.data.activityR"
@@ -288,18 +288,18 @@ function placeEntity(event: MouseEvent) {
         <input
           type="number"
           id="driveMaxVelocity"
-          min="0"
+          min="0.001"
           max="1"
           step="0.1"
           :disabled="inputs.submitted"
           v-model="inputs.data.driveMaxVelocity"
         />
-        <label for="driveMaxVelocity">Drive max velocity</label>
+        <label for="driveMaxVelocity">Drive max velocity </label>
 
         <input
           type="number"
           id="bearingMaxVelocity"
-          min="0"
+          min="0.001"
           max="6.28"
           step="0.1"
           :disabled="inputs.submitted"
@@ -443,12 +443,56 @@ function placeEntity(event: MouseEvent) {
         inputs.error
       }}</small>
     </div>
+
+    <div
+      class="inputs-form card inputs-state"
+      v-if="inputs.data.manipulators.length > 0"
+    >
+      <h3>Manipulators</h3>
+
+      <div class="inputs-list">
+        <div v-for="manip in inputs.data.manipulators" class="entity-info">
+          <div>
+            <div>
+              <strong>{{ manip.id }}</strong>
+            </div>
+            <div>Activity radius: {{ manip.radius }}</div>
+            <div>Bins for: {{ manip.bins.map((bin) => bin.itemType) }}</div>
+            <div>
+              Current angle: {{ manip._currentBearingAngle.toFixed(4) }}
+            </div>
+            <div>
+              Drive place: {{ manip._currentDrivePlaceScale.toFixed(4) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="inputs-form card inputs-state"
+      v-if="inputs.data.bins.length > 0"
+    >
+      <h3>Bins</h3>
+      <div class="inputs-list">
+        <div v-for="bin in inputs.data.bins" class="entity-info">
+          <div>
+            <div>
+              <strong>{{ bin.id }}</strong>
+            </div>
+            <div>Item type: {{ bin.itemType }}</div>
+            <div>Items in bin: {{ bin.itemsPlaced }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 .inputs-overlay {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   margin: 2rem;
@@ -463,11 +507,34 @@ function placeEntity(event: MouseEvent) {
     margin-top: 1rem;
   }
 }
+.inputs-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-items: center;
+  align-items: center;
+  row-gap: 0.625rem;
+  column-gap: 0.625rem;
+}
+.inputs-list * {
+  flex-grow: 1;
+}
+.inputs-state {
+  margin-top: 1.5rem;
+  width: 100%;
+  display: flex;
+}
+.entity-info {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  align-items: center;
+}
 .num-inputs {
   width: 100%;
   display: grid;
   grid-template: 40px 40px 40px 40px / 100px 1fr;
-  grid-gap: 1rem;
+  grid-gap: 0.625rem;
   label {
     margin-left: 1rem;
   }

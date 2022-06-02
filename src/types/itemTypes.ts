@@ -15,8 +15,9 @@ export enum ItemTypes {
 export type ItemType = keyof typeof ItemTypes;
 
 export interface IItem {
+  id: string;
   img: HTMLImageElement;
   item_type: ItemType;
   coordinates: IPoint;
-  holdedBy?: Manipulator; // используется ли манипулятором
+  holdedBy: string; //Manipulator | undefined; // используется ли манипулятором
 }
