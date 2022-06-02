@@ -161,6 +161,18 @@ export class Manipulator {
 
           //console.log(2);
           return true;
+        } else {
+          if (!(this.holdedItem === undefined)) {
+            const trafficState = useTrafficState();
+            trafficState.traffic = trafficState.traffic.filter(
+              (item1) => !(item1.id === this.holdedItem?.id)
+            );
+          }
+
+          this.holdedItem = undefined;
+
+          //console.log(2);
+          return true;
         }
       }
     }
@@ -553,7 +565,10 @@ export class Manipulator {
           ),
           item: e,
         }))
-        .filter((e) => e.time >= 0);
+        .filter(
+          (e) =>
+            e.time >= 0 && (e.item.holdedBy == "" || e.item.holdedBy == this.id)
+        );
 
       if (temparr.length == 0) {
         //SET A TASK
