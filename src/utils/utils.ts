@@ -61,3 +61,7 @@ export function getItemCenter(item: IItem): IPoint {
     y: Math.floor(item.coordinates.y + item.img.height * 0.5),
   };
 }
+
+export function xInRange(x: number, range: IPoint) {
+  return (range.x < x && x < range.y) || (range.y < x && x < range.x);
+}

@@ -92,7 +92,8 @@ export const useInputsState = defineStore({
           traffic,
           this.data.lineVelocity,
           this.data.driveMaxVelocity,
-          this.data.bearingMaxVelocity
+          this.data.bearingMaxVelocity,
+          this.data.manipulators
         )
       );
     },

@@ -68,8 +68,6 @@ function animate() {
     //   },
     // })
     (item) => {
-      console.log("item ", item);
-      console.log("item.holdedBy ", item.holdedBy);
       let manip;
       if (!(item.holdedBy === "")) {
         manip = inputsState.data.manipulators.find(

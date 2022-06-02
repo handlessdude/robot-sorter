@@ -8,6 +8,7 @@ import {
   getMovedPoint,
   toStandartRadianForm,
   getItemCenter,
+  xInRange,
 } from "@/utils/utils";
 import { worldConstants } from "@/stupidConstants/worldConstants";
 import { hri } from "human-readable-ids";
@@ -31,7 +32,7 @@ export class Manipulator {
   taskList: Array<Function>;
   isActiveTask: boolean;
   isNecessaryRecalc: boolean;
-
+  isAdditionalActions: boolean;
   // shiza
   readonly size_radius: number;
   color: string;
@@ -78,7 +79,7 @@ export class Manipulator {
     this.taskList = Array<Function>();
     this.isActiveTask = false;
     this.isNecessaryRecalc = false;
-
+    this.isAdditionalActions = false;
     // shiza
     this.size_radius = size_radius;
     this.color = color;
@@ -165,11 +166,11 @@ export class Manipulator {
       }
     }
 
-    if (isOnTraffic(this.getDriveCoordinates())) {
-      this.holdedItem.holdedBy = ""; //undefined;
-      this.holdedItem = undefined;
-      //console.log(3);
-    }
+    //if (isOnTraffic(this.getDriveCoordinates())) {
+    this.holdedItem.holdedBy = ""; //undefined;
+    this.holdedItem = undefined;
+    //console.log(3);
+    //}
 
     //console.log(4);
     return false;
@@ -533,11 +534,91 @@ export class Manipulator {
     );
   }
 
+  ST_deliverAnotherItem(item: IItem, venue: IPoint): void {
+    //
+    this.isAdditionalActions = true;
+    this.taskList.push(
+      () => this.ST_moveToPoint(venue),
+      () => {
+        console.log(1);
+        if (this.driveTarget == undefined && this.bearingTarget == undefined) {
+          this.isActiveTask = false;
+        }
+      },
+      () => this.tryTakeItem(item),
+      () => {
+        console.log(2);
+        if (!this.holdedItem) {
+          this.taskList = Array<Function>();
+          this.isNecessaryRecalc = true;
+        }
+      },
+      () => {
+        console.log(3);
+        this.ST_moveToPoint(
+          getMovedPoint(
+            this.coordinates,
+            this.radius,
+            this.coordinates.x > 500 ? Math.PI + 0.3 : -0.3
+          )
+        );
+      },
+      () => {
+        console.log(4);
+        if (this.driveTarget == undefined && this.bearingTarget == undefined)
+          this.isActiveTask = false;
+      },
+      () => {
+        console.log(5);
+        if (!this.tryThrowItem()) {
+          //an impossible way
+          console.log("impossible");
+        }
+      }
+    );
+  }
+
+  hasLineManip(
+    item: IItem,
+    manips: Array<Manipulator>
+  ): Manipulator | undefined {
+    return manips
+      .filter((m) => m.itemBelongs(item))
+      .find((m) =>
+        xInRange(item.coordinates.x, {
+          x: m.radius + m.coordinates.x,
+          y: -m.radius + m.coordinates.x,
+        })
+      );
+  }
+
+  isIntersectedWith(manip: Manipulator) {
+    return (
+      xInRange(this.coordinates.x + this.radius, {
+        x: manip.coordinates.x + manip.radius,
+        y: manip.coordinates.x - manip.radius,
+      }) ||
+      xInRange(this.coordinates.x - this.radius, {
+        x: manip.coordinates.x + manip.radius,
+        y: manip.coordinates.x - manip.radius,
+      })
+    );
+  }
+
+  isIntersectedWithLineItemManip(item: IItem, worldManips: Array<Manipulator>) {
+    return (
+      worldManips
+        .filter((m) => m.itemBelongs(item))
+        .filter((m) => isIntersectedWith(m)).length > 0
+    );
+  }
+
   think(
     worldItems: Array<IItem>,
     lineVelocity: number,
     driveVelocity: number,
-    bearingVelocity: number
+    bearingVelocity: number,
+    worldManips: Array<Manipulator>
   ): void {
     if (this.updateItemsInBound(worldItems) || this.isNecessaryRecalc) {
       //rethink
@@ -557,16 +638,53 @@ export class Manipulator {
 
       if (temparr.length == 0) {
         //SET A TASK
-        this.ST_moveDrive(0.6);
-        this.ST_rotateBearing(this.coordinates.x > 500 ? Math.PI + 0.3 : -0.3);
+        const temparr2 = this.inBoundItems
+          .filter((e) => this.itemBelongs(e) == undefined)
+          .map((e) => ({
+            ...this.timeCoordsToItem(
+              e,
+              lineVelocity,
+              driveVelocity,
+              bearingVelocity
+            ),
+            item: e,
+          }))
+          .filter((e) => e.time >= 0);
+        if (temparr2.length != 0) {
+          const temparr3 = temparr2.filter((e) => {
+            const tempManip = this.hasLineManip(e.item, worldManips);
+            return tempManip != undefined && this.isIntersectedWith(tempManip);
+          });
+          if (temparr3.length != 0) {
+            //const tempManip = this.hasLineManip(temparr3[0].item, worldManips);
+
+            if (this.holdedItem == undefined) {
+              this.ST_deliverAnotherItem(
+                temparr3[0].item,
+                temparr3[0].coordinates
+              );
+            }
+          }
+        } else {
+          this.ST_moveDrive(0.6);
+          this.ST_rotateBearing(
+            this.coordinates.x > 500 ? Math.PI + 0.3 : -0.3
+          );
+        }
       } else {
         const choosedItem = temparr.reduce((_prev, _curr) => {
           if (_curr.time < _prev.time) return _curr;
           else return _prev;
         }, temparr[0]);
 
-        if (this.holdedItem == undefined)
+        if (this.holdedItem == undefined || this.isAdditionalActions) {
+          if (this.isAdditionalActions) {
+            this.tryThrowItem();
+            this.isAdditionalActions = false;
+            this.isActiveTask = false;
+          }
           this.ST_deliverItem(choosedItem.item, choosedItem.coordinates);
+        }
       }
     } else {
       // update states due to the task list
@@ -585,10 +703,17 @@ export class Manipulator {
     worldItems: Array<IItem>,
     lineVelocity: number,
     driveVelocity: number,
-    bearingVelocity: number
+    bearingVelocity: number,
+    worldManips: Array<Manipulator>
   ): void {
     // thinking
-    this.think(worldItems, lineVelocity, driveVelocity, bearingVelocity);
+    this.think(
+      worldItems,
+      lineVelocity,
+      driveVelocity,
+      bearingVelocity,
+      worldManips
+    );
     // choosing an action
     //TODO:
     // moving
